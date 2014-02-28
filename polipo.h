@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include <errno.h>
 #include <string.h>
 #include <assert.h>
+#include <glob.h>
 #ifndef _WIN32
 #include <unistd.h>
 #include <sys/time.h>
@@ -235,6 +236,8 @@ THE SOFTWARE.
 #include "log.h"
 #include "auth.h"
 #include "tunnel.h"
+#include "mod_lua.h"
+#include "mod_lua_api.h"
 
 extern AtomPtr configFile;
 extern int daemonise;

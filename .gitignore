@@ -1,3 +1,5 @@
+.DS_Store
 polipo
 core
 *.o
+*.a

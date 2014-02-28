@@ -46,12 +46,15 @@ static HTTPServerPtr servers = 0;
 static int httpServerContinueConditionHandler(int, ConditionHandlerPtr);
 static int initParentProxy(void);
 static int parentProxySetter(ConfigVariablePtr var, void *value);
+static int luaScriptDirSetter(ConfigVariablePtr var, void *value);
 static void httpServerDelayedFinish(HTTPConnectionPtr);
 static int allowUnalignedRangeRequests = 0;
 
 void
 preinitServer(void)
 {
+    CONFIG_VARIABLE_SETTABLE(luaScriptDir, CONFIG_ATOM, luaScriptDirSetter,
+                    "Lua script directory");
     CONFIG_VARIABLE_SETTABLE(parentProxy, CONFIG_ATOM_LOWER, parentProxySetter,
                     "Parent proxy (host:port).");
     CONFIG_VARIABLE(serverExpireTime, CONFIG_TIME,
@@ -95,6 +98,14 @@ preinitServer(void)
                              "Maximum number of requests on a server-side connection.");
     CONFIG_VARIABLE(alwaysAddNoTransform, CONFIG_BOOLEAN,
                     "If true, add a no-transform directive to all requests.");
+}
+
+static int
+luaScriptDirSetter(ConfigVariablePtr var, void *value)
+{
+    configAtomSetter(var, value);
+    initLuaScripts();
+    return 1;
 }
 
 static int
@@ -238,6 +249,7 @@ initServer(void)
     if(serverSlots1 > serverMaxSlots)
         serverSlots1 = serverMaxSlots;
 
+    initLuaScripts();
     initParentProxy();
 
     event = scheduleTimeEvent(serverExpireTime / 60 + 60, expireServersHandler,
@@ -403,6 +415,8 @@ httpMakeServerRequest(char *name, int port, ObjectPtr object,
     int rc;
 
     assert(!(object->flags & OBJECT_INPROGRESS));
+
+    modLuaApi_parentProxyScript(method, object);
 
     if(parentHost) {
         server = getServer(parentHost->string, parentPort, 1);

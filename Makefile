@@ -1,9 +1,16 @@
+LUA_PLATFORM = ansi
+LUA_VERSION = 5.2.3
+LUA_DIR = lua-$(LUA_VERSION)
+LUA_SRC_DIR = $(LUA_DIR)/src
+
 PREFIX = /usr/local
 BINDIR = $(PREFIX)/bin
 MANDIR = $(PREFIX)/man
 INFODIR = $(PREFIX)/info
 LOCAL_ROOT = /usr/share/polipo/www
 DISK_CACHE_ROOT = /var/cache/polipo
+
+BUILD_LUA = make clean ansi CFLAGS='-ULUA_DL_DLOPEN'
 
 # To compile with Unix CC:
 
@@ -12,8 +19,10 @@ DISK_CACHE_ROOT = /var/cache/polipo
 # To compile with GCC:
 
 # CC = gcc
-CDEBUGFLAGS = -Os -g -Wall -fno-strict-aliasing
+CDEBUGFLAGS = -Os -ggdb -Wall -fno-strict-aliasing \
+  -I$(LUA_SRC_DIR)
 
+LDFLAGS = $(LUA_SRC_DIR)/liblua.a
 # To compile on a pure POSIX system:
 
 # CC = c89
@@ -65,14 +74,16 @@ CFLAGS = $(MD5INCLUDES) $(CDEBUGFLAGS) $(DEFINES) $(EXTRA_DEFINES)
 SRCS = util.c event.c io.c chunk.c atom.c object.c log.c diskcache.c main.c \
        config.c local.c http.c client.c server.c auth.c tunnel.c \
        http_parse.c parse_time.c dns.c forbidden.c \
-       md5import.c md5.c ftsimport.c fts_compat.c socks.c mingw.c
+       md5import.c md5.c ftsimport.c fts_compat.c socks.c mingw.c \
+       mod_lua.c mod_lua_api.c
 
 OBJS = util.o event.o io.o chunk.o atom.o object.o log.o diskcache.o main.o \
        config.o local.o http.o client.o server.o auth.o tunnel.o \
        http_parse.o parse_time.o dns.o forbidden.o \
-       md5import.o ftsimport.o socks.o mingw.o
+       md5import.o ftsimport.o socks.o mingw.o \
+       mod_lua.o mod_lua_api.o
 
-polipo$(EXE): $(OBJS)
+polipo$(EXE): lua $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o polipo$(EXE) $(OBJS) $(MD5LIBS) $(LDLIBS)
 
 ftsimport.o: ftsimport.c fts_compat.c
@@ -130,9 +141,15 @@ polipo.man.html: polipo.man
 TAGS: $(SRCS)
 	etags $(SRCS)
 
-.PHONY: clean
+lua:
+	cd $(LUA_DIR) && $(MAKE) $(LUA_PLATFORM)
 
-clean:
+.PHONY: lua_clean clean
+
+lua_clean:
+	cd $(LUA_DIR) && $(MAKE) clean
+
+clean: lua_clean
 	-rm -f polipo$(EXE) *.o *~ core TAGS gmon.out
 	-rm -f polipo.cp polipo.fn polipo.log polipo.vr
 	-rm -f polipo.cps polipo.info* polipo.pg polipo.toc polipo.vrs

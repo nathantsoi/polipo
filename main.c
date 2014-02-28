@@ -98,7 +98,7 @@ main(int argc, char **argv)
         configFile = expandTilde(configFile);
 
     if(configFile == NULL) {
-        configFile = expandTilde(internAtom("~/.polipo"));
+        configFile = expandTilde(internAtom("~/.polipo/config"));
         if(configFile)
             if(access(configFile->string, F_OK) < 0) {
                 releaseAtom(configFile);

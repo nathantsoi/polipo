@@ -2,7 +2,7 @@
 
 # You should not need to use a configuration file; all configuration
 # variables have reasonable defaults.  If you want to use one, you
-# can copy this to /etc/polipo/config or to ~/.polipo and modify.
+# can copy this to /etc/polipo/config or to ~/.polipo/config and modify.
 
 # This file only contains some of the configuration variables; see the
 # list given by ``polipo -v'' and the manual for more.
@@ -159,3 +159,10 @@
 # outgoing requests.
 
 # alwaysAddNoTransform = true
+
+# Uncomment this if you want to enable lua scripting
+#  this directory should contain one file for each callback you want to implement
+#  currently supported scripts files are:
+#  parentProxyScript.lua
+
+# luaScriptDir = "~/.polipo/lua"

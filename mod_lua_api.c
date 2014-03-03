@@ -36,7 +36,7 @@ const char * METHOD_STRINGS[] =
 };
 
 void
-modLuaApi_parentProxyScript(int method, ObjectPtr object) {
+modLuaApi_parentProxyScript(int method, ObjectPtr object, AtomPtr headers) {
     size_t len;
     char* url = object->key;
     // pgl.yoyo.org/luai/i/lua_call
@@ -46,7 +46,8 @@ modLuaApi_parentProxyScript(int method, ObjectPtr object) {
     if(lua_isfunction(L,lua_gettop(L))) {
         lua_pushstring(L, METHOD_STRINGS[method]);
         lua_pushstring(L, url);
-        int err = lua_pcall(L, 2, LUA_MULTRET, last_function_number);
+        lua_pushstring(L, headers->string);
+        int err = lua_pcall(L, 3, LUA_MULTRET, last_function_number);
         if (err != 0) {
             modLua_reportErrors(L, err);
         } else {

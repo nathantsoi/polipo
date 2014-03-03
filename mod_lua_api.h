@@ -24,6 +24,6 @@ THE SOFTWARE.
 #ifndef _MOD_LUA_API
 #define _MOD_LUA_API
 
-void modLuaApi_parentProxyScript(int method, ObjectPtr object);
+void modLuaApi_parentProxyScript(int method, ObjectPtr object, AtomPtr headers);
 
 #endif

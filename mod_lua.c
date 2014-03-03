@@ -28,32 +28,42 @@ int luaActive = 0;
 
 int last_function_number;
 static void open_libs(lua_State *L);
+static AtomPtr currentDir();
+static void loadScriptDir(AtomPtr dir);
+static void addToLuaPath(AtomPtr path);
+
 
 void
 modLua_init() {
-    luaActive = 1;
-    L = luaL_newstate();
-    open_libs(L);
+  AtomPtr current_dir_lua = NULL;
+
+  luaActive = 1;
+  L = luaL_newstate();
+  open_libs(L);
+
+  current_dir_lua = currentDir();
+  addToLuaPath(current_dir_lua);
+  releaseAtom(current_dir_lua);
 }
 
 void
 modLua_shutdown() {
-    luaActive = 0;
-    lua_close(L);
+  luaActive = 0;
+  lua_close(L);
 }
 
 static void open_libs(lua_State *L)
 {
-    luaL_openlibs(L);
+  luaL_openlibs(L);
 }
 
 void
 modLua_reportErrors(lua_State *L, int status)
 {
-    if(status == 0)
-        return;
-    fprintf(stderr, "%sLua error: '%s'%s\n", KRED, lua_tostring(L, -1), KEND);
-    lua_pop(L, 1);
+  if(status == 0)
+    return;
+  fprintf(stderr, "%sLua error: '%s'%s\n", KRED, lua_tostring(L, -1), KEND);
+  lua_pop(L, 1);
 }
 
 void
@@ -77,51 +87,94 @@ modLua_printGlobals() {
 
 void
 modLua_loadFile(char* filename) {
-    int err = luaL_dofile(L, filename);
-    if (err) {
-      printf("Error loading lua source: '%s'\n", filename);
-      modLua_reportErrors(L, err);
-    } else {
-      printf("Loaded lua source: '%s'\n", filename);
-    }
-    fflush(stdout);
+  int err = luaL_dofile(L, filename);
+  if (err) {
+    printf("Error loading lua source: '%s'\n", filename);
+    modLua_reportErrors(L, err);
+  } else {
+    printf("Loaded lua source: '%s'\n", filename);
+  }
+  fflush(stdout);
 }
 
 int
 initLuaScripts()
 {
-    glob_t globBuffer;
-    int i, matchCount;
+  if(luaScriptDir != NULL && luaScriptDir->length == 0) {
+    releaseAtom(luaScriptDir);
+    luaScriptDir = NULL;
+  }
 
-    if(luaScriptDir != NULL && luaScriptDir->length == 0) {
-        releaseAtom(luaScriptDir);
-        luaScriptDir = NULL;
-    }
+  if(luaScriptDir == NULL)
+    luaScriptDir = internAtom("~/.polipo/lua/");
 
-    if(luaScriptDir == NULL)
-      luaScriptDir = internAtom("~/.polipo/lua/");
+  luaScriptDir = expandTilde(luaScriptDir);
+  loadScriptDir(luaScriptDir);
+  releaseAtom(luaScriptDir);
+  return 1;
+}
 
-    luaScriptDir = expandTilde(luaScriptDir);
-    if (luaScriptDir->string[luaScriptDir->length - 1] != '/') {
-      luaScriptDir = atomCat(luaScriptDir, "/*");
+static AtomPtr
+currentDir() {
+  char buf[PATH_MAX + 1];
+  char *res = realpath("./lua", buf);
+  if (res) {
+    return internAtom(buf);
+  } else {
+    fprintf(stderr, "could not find a lua folder in the current dir");
+  }
+  return 0;
+}
+
+static void
+loadScriptDir(AtomPtr dir) {
+  glob_t globBuffer;
+  int i, matchCount;
+
+  if (!dir || dir->length < 1) {
+    return;
+  }
+
+  if (dir->string[dir->length - 1] != '/') {
+    dir = atomCat(dir, "/*");
+  } else {
+    dir = atomCat(dir, "*");
+  }
+
+  glob(dir->string, 0 , NULL , &globBuffer);
+  matchCount = globBuffer.gl_pathc;
+  if(matchCount > 0) {
+    modLua_init();
+  }
+
+  for (i=0; i < matchCount; i++) {
+    if(access(globBuffer.gl_pathv[i], F_OK) < 0) {
+      fprintf(stderr, "Error loading lua source '%s'\n", globBuffer.gl_pathv[i]);
     } else {
-      luaScriptDir = atomCat(luaScriptDir, "*");
+      modLua_loadFile(globBuffer.gl_pathv[i]);
     }
+  }
+  globfree(&globBuffer);
+}
 
-    glob(luaScriptDir->string, 0 , NULL , &globBuffer);
-    matchCount = globBuffer.gl_pathc;
-    if(matchCount > 0) {
-        modLua_init();
-    }
-
-    for (i=0; i < matchCount; i++) {
-        if(access(globBuffer.gl_pathv[i], F_OK) < 0) {
-            fprintf(stderr, "Error loading lua source '%s'\n", globBuffer.gl_pathv[i]);
-        } else {
-            modLua_loadFile(globBuffer.gl_pathv[i]);
-        }
-    }
-    globfree(&globBuffer);
-
-    return 1;
+static void
+addToLuaPath(AtomPtr path) {
+  AtomPtr cur_path;
+  if (!path || path->length < 1)
+    return;
+  if (path->string[path->length - 1] != '/') {
+    path = atomCat(path, "/?.lua");
+  } else {
+    path = atomCat(path, ".lua");
+  }
+  lua_getglobal(L, "package");
+  lua_getfield(L, -1, "path");
+  cur_path = internAtom(lua_tostring(L, -1));
+  cur_path = atomCat(cur_path, ";");
+  cur_path = atomCat(cur_path, path->string);
+  lua_pop(L, 1);
+  lua_pushstring(L, cur_path->string);
+  lua_setfield(L, -2, "path");
+  lua_pop(L, 1);
+  return;
 }

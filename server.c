@@ -416,7 +416,7 @@ httpMakeServerRequest(char *name, int port, ObjectPtr object,
 
     assert(!(object->flags & OBJECT_INPROGRESS));
 
-    modLuaApi_parentProxyScript(method, object);
+    modLuaApi_parentProxyScript(method, object, requestor->headers);
 
     if(parentHost) {
         server = getServer(parentHost->string, parentPort, 1);

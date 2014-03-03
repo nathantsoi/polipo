@@ -49,7 +49,7 @@ howevever, if initialization is done within a lua script file, outside of an api
 
 e.g. no restart required. note, this example is explained in depth below
 ```
- parentProxyScript = function(method, url)
+ parentProxyScript = function(method, url, headers)
    if method == "GET" then
      return "127.0.0.1", "8080"
    end
@@ -60,7 +60,7 @@ e.g. no restart required. note, this example is explained in depth below
 e.g. if upstreamHost is changed, polipo must be restarted:
 ```
 upstreamHost = "127.0.0.1"
-parentProxyScript = function(method, url)
+parentProxyScript = function(method, url, headers)
   if method == "GET" then
     return upstreamHost, "8080"
   end
@@ -71,14 +71,14 @@ end
 
 ## API methods
 
- - parentProxyScript(method, url): returns host, port
+ - parentProxyScript(method, url, headers): returns host, port
 
    parentProxyScript takes a method name and url then returns a parent proxy hostname and port
 
    e.g.
 ```
 -- always use the proxy  on localhost:8080 for GET requests to and no proxy for other requests
-parentProxyScript = function(method, url)
+parentProxyScript = function(method, url, headers)
   if method == "GET" then
     return "127.0.0.1", "8080"
   end

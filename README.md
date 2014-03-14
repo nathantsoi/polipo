@@ -53,7 +53,7 @@ e.g. no restart required. note, this example is explained in depth below
    if method == "GET" then
      return "127.0.0.1", "8080"
    end
-   return nil, nil
+   return nil, nil, nil
  end
 ```
 
@@ -64,14 +64,14 @@ parentProxyScript = function(method, url, headers)
   if method == "GET" then
     return upstreamHost, "8080"
   end
-  return nil, nil
+  return nil, nil, nil
 end
 ```
 
 
 ## API methods
 
- - parentProxyScript(method, url, headers): returns host, port
+ - parentProxyScript(method, url, headers): returns host (string), port (int or string), headers (string)
 
    parentProxyScript takes a method name and url then returns a parent proxy hostname and port
 
@@ -82,7 +82,7 @@ parentProxyScript = function(method, url, headers)
   if method == "GET" then
     return "127.0.0.1", "8080"
   end
-  return nil, nil
+  return nil, nil, nil
 end
 ```
 

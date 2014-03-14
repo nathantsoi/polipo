@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 #ifndef NO_DISK_CACHE
 
-#include "md5import.h"
+#include "../vendor/md5/md5import.h"
 
 int maxDiskEntries = 32;
 
@@ -64,7 +64,7 @@ static int maxDiskEntriesSetter(ConfigVariablePtr, void*);
 static int atomSetterFlush(ConfigVariablePtr, void*);
 static int reallyWriteoutToDisk(ObjectPtr object, int upto, int max);
 
-void 
+void
 preinitDiskcache()
 {
     diskCacheRoot = internAtom(DISK_CACHE_ROOT);
@@ -89,7 +89,7 @@ preinitDiskcache()
                     "Time after which on-disk objects are removed.");
     CONFIG_VARIABLE(diskCacheTruncateTime, CONFIG_TIME,
                     "Time after which on-disk objects are truncated.");
-    CONFIG_VARIABLE(diskCacheTruncateSize, CONFIG_INT, 
+    CONFIG_VARIABLE(diskCacheTruncateSize, CONFIG_INT,
                     "Size to which on-disk objects are truncated.");
     CONFIG_VARIABLE(preciseExpiry, CONFIG_BOOLEAN,
                     "Whether to consider all files for purging.");
@@ -174,9 +174,9 @@ initDiskcache()
         switch(rc) {
         case 0: break;
         case -1: do_log_error(L_WARN, errno, "Disabling disk cache"); break;
-        case -2: 
+        case -2:
             do_log(L_WARN, "Disabling disk cache: path %s is not absolute.\n",
-                   diskCacheRoot->string); 
+                   diskCacheRoot->string);
             break;
         default: abort();
         }
@@ -190,8 +190,8 @@ initDiskcache()
         switch(rc) {
         case 0: break;
         case -1: do_log_error(L_WARN, errno, "Disabling local tree"); break;
-        case -2: 
-            do_log(L_WARN, "Disabling local tree: path is not absolute.\n"); 
+        case -2:
+            do_log(L_WARN, "Disabling local tree: path is not absolute.\n");
             break;
         default: abort();
         }
@@ -318,7 +318,7 @@ localFilename(char *buf, int n, char *key, int len)
         if(j >= n - 1)
             return -1;
         if(key[i] == '/' && i < len - 2)
-            if(key[i + 1] == '.' && 
+            if(key[i + 1] == '.' &&
                (key[i + 2] == '.' || key[i + 2] == '/'))
                 return -1;
         buf[j++] = key[i++];
@@ -446,7 +446,7 @@ dirnameUrl(char *url, int n, char *name, int len)
                 return NULL;
             url[j++] = c1 * 16 + c2; if(j >= n) goto fail;
             i += 2;             /* skip extra digits */
-        } else if(i < len - 1 && 
+        } else if(i < len - 1 &&
                   name[i] == '.' && name[i + 1] == '/') {
                 return NULL;
         } else if(i == len - 1 && name[i] == '.') {
@@ -488,7 +488,7 @@ createFile(const char *name, int path_start)
         do_log_error(L_ERROR, errno, "Couldn't create disk file %s", name);
         return -1;
     }
-    
+
     n = path_start;
     while(name[n] != '\0' && n < 1024) {
         while(name[n] != '/' && name[n] != '\0' && n < 512)
@@ -566,7 +566,7 @@ chooseBodyOffset(int n, ObjectPtr object)
 
     return body_offset;
 }
- 
+
 /* Assumes the file descriptor is at offset 0.  Returns -1 on failure,
    otherwise the offset at which the file descriptor is left. */
 /* If chunk is not null, it should be the first chunk of the object,
@@ -667,7 +667,7 @@ writeHeaders(int fd, int *body_offset_return,
 
     if(rc < body_offset)
         goto fail;
-    if(object->length >= 0 && 
+    if(object->length >= 0 &&
        rc - body_offset >= object->length)
         object->flags |= OBJECT_DISK_ENTRY_COMPLETE;
 
@@ -762,7 +762,7 @@ localObjectMimeType(ObjectPtr object, char **encoding_return)
 
     for(i = 0; i < sizeof(mimeEntries) / sizeof(mimeEntries[0]); i++) {
         int len = strlen(mimeEntries[i].extension);
-        if(nlen > len && 
+        if(nlen > len &&
            name[nlen - len - 1] == '.' &&
            memcmp(name + nlen - len, mimeEntries[i].extension, len) == 0)
             return mimeEntries[i].mime;
@@ -790,14 +790,14 @@ validateLocalEntry(ObjectPtr object, int fd,
     if(S_ISREG(ss.st_mode)) {
         if(!(ss.st_mode & S_IROTH) ||
            (object->length >= 0 && object->length != ss.st_size) ||
-           (object->last_modified >= 0 && 
+           (object->last_modified >= 0 &&
             object->last_modified != ss.st_mtime))
             return -1;
     } else {
         notifyObject(object);
         return -1;
     }
-    
+
     n = snnprintf(buf, 0, 512, "%lx-%lx-%lx",
                   (unsigned long)ss.st_ino,
                   (unsigned long)ss.st_size,
@@ -815,7 +815,7 @@ validateLocalEntry(ObjectPtr object, int fd,
         if(!object->last_modified && !object->etag)
             return -1;
     }
-       
+
     if(object->flags & OBJECT_INITIAL) {
         object->length = ss.st_size;
         object->last_modified = ss.st_mtime;
@@ -851,7 +851,7 @@ validateLocalEntry(ObjectPtr object, int fd,
    Returns -1 if not valid, 1 if metadata should be written out, 0
    otherwise. */
 int
-validateEntry(ObjectPtr object, int fd, 
+validateEntry(ObjectPtr object, int fd,
               int *body_offset_return, off_t *offset_return)
 {
     char *buf;
@@ -1030,7 +1030,7 @@ validateEntry(ObjectPtr object, int fd,
     }
     if(object->date <= date)
         object->date = date;
-    else 
+    else
         dirty = 1;
     if(object->last_modified < 0)
         object->last_modified = last_modified;
@@ -1223,14 +1223,14 @@ makeDiskEntry(ObjectPtr object, int create)
                 rc = unlink(buf);
                 if(rc < 0 && errno != ENOENT) {
                     do_log_error(L_WARN,  errno,
-                                 "Couldn't unlink stale disk entry %s", 
+                                 "Couldn't unlink stale disk entry %s",
                                  scrub(buf));
                     /* But continue -- it's okay to have stale entries. */
                 }
             }
         }
 
-        if(fd < 0 && create && name_len > 0 && 
+        if(fd < 0 && create && name_len > 0 &&
            !(object->flags & OBJECT_INITIAL)) {
             fd = createFile(buf, diskCacheRoot->length);
             if(fd < 0)
@@ -1249,7 +1249,7 @@ makeDiskEntry(ObjectPtr object, int create)
                     rc = unlink(buf);
                     if(rc < 0 && errno != ENOENT)
                         do_log_error(L_ERROR, errno,
-                                     "Couldn't unlink truncated entry %s", 
+                                     "Couldn't unlink truncated entry %s",
                                      scrub(buf));
                     close(fd);
                     return NULL;
@@ -1265,7 +1265,7 @@ makeDiskEntry(ObjectPtr object, int create)
         if(localDocumentRoot == NULL || localDocumentRoot->length == 0)
             return NULL;
 
-        name_len = 
+        name_len =
             localFilename(buf, 1024, object->key, object->key_size);
         if(name_len < 0)
             return NULL;
@@ -1410,7 +1410,7 @@ rewriteEntry(ObjectPtr object)
         free(buf);
     return 1;
 }
-            
+
 int
 destroyDiskEntry(ObjectPtr object, int d)
 {
@@ -1440,7 +1440,7 @@ destroyDiskEntry(ObjectPtr object, int d)
         if(entry->filename) {
             urc = unlink(entry->filename);
             if(urc < 0)
-                do_log_error(L_WARN, errno, 
+                do_log_error(L_WARN, errno,
                              "Couldn't unlink %s", scrub(entry->filename));
         }
     } else {
@@ -1489,7 +1489,7 @@ destroyDiskEntry(ObjectPtr object, int d)
         return 1;
 }
 
-ObjectPtr 
+ObjectPtr
 objectGetFromDisk(ObjectPtr object)
 {
     DiskCacheEntryPtr entry = makeDiskEntry(object, 0);
@@ -1498,7 +1498,7 @@ objectGetFromDisk(ObjectPtr object)
 }
 
 
-int 
+int
 objectFillFromDisk(ObjectPtr object, int offset, int chunks)
 {
     DiskCacheEntryPtr entry;
@@ -1513,7 +1513,7 @@ objectFillFromDisk(ObjectPtr object, int offset, int chunks)
         return 0;
 
     if(object->length >= 0) {
-        chunks = MIN(chunks, 
+        chunks = MIN(chunks,
                      (object->length - offset + CHUNK_SIZE - 1) / CHUNK_SIZE);
     }
 
@@ -1547,7 +1547,7 @@ objectFillFromDisk(ObjectPtr object, int offset, int chunks)
     entry = makeDiskEntry(object, 0);
     if(!entry)
         return 0;
-                
+
     for(k = 0; k < chunks; k++) {
         i = offset / CHUNK_SIZE + k;
         if(!object->chunks[i].data)
@@ -1600,18 +1600,18 @@ objectFillFromDisk(ObjectPtr object, int offset, int chunks)
         if(entry->object->length >= 0 && entry->size < 0 &&
            entry->offset - entry->body_offset == entry->object->length)
             entry->size = entry->object->length;
-            
+
         if(rc < CHUNK_SIZE - j) {
             /* Paranoia: the read may have been interrupted half-way. */
             if(entry->size < 0) {
                 if(rc == 0 ||
                    (entry->object->length >= 0 &&
-                    entry->object->length == 
+                    entry->object->length ==
                     entry->offset - entry->body_offset))
                     entry->size = entry->offset - entry->body_offset;
                 break;
             } else if(entry->size != entry->offset - entry->body_offset) {
-                if(rc == 0 || 
+                if(rc == 0 ||
                    entry->size < entry->offset - entry->body_offset) {
                     do_log(L_WARN,
                            "Disk entry size changed behind our back: "
@@ -1643,7 +1643,7 @@ objectFillFromDisk(ObjectPtr object, int offset, int chunks)
     }
 }
 
-int 
+int
 writeoutToDisk(ObjectPtr object, int upto, int max)
 {
     if(maxDiskCacheEntrySize >= 0 && object->size > maxDiskCacheEntrySize) {
@@ -1655,8 +1655,8 @@ writeoutToDisk(ObjectPtr object, int upto, int max)
 
     return reallyWriteoutToDisk(object, upto, max);
 }
-        
-static int 
+
+static int
 reallyWriteoutToDisk(ObjectPtr object, int upto, int max)
 {
     DiskCacheEntryPtr entry;
@@ -1668,7 +1668,7 @@ reallyWriteoutToDisk(ObjectPtr object, int upto, int max)
     if(upto < 0)
         upto = object->size;
 
-    if((object->cache_control & CACHE_NO_STORE) || 
+    if((object->cache_control & CACHE_NO_STORE) ||
        (object->flags & OBJECT_LOCAL))
         return 0;
 
@@ -1744,16 +1744,16 @@ reallyWriteoutToDisk(ObjectPtr object, int upto, int max)
     return bytes;
 }
 
-int 
+int
 writeoutMetadata(ObjectPtr object)
 {
     DiskCacheEntryPtr entry;
     int rc;
 
-    if((object->cache_control & CACHE_NO_STORE) || 
+    if((object->cache_control & CACHE_NO_STORE) ||
        (object->flags & OBJECT_LOCAL))
         return 0;
-    
+
     entry = makeDiskEntry(object, 0);
     if(entry == NULL || entry == &negativeEntry)
         goto fail;
@@ -1844,7 +1844,7 @@ readDiskObject(char *filename, struct stat *sb)
         rc = read(fd, buf, bufsize);
         if(rc < 0)
             goto fail;
-        
+
         n = findEndOfHeaders(buf, 0, rc, &dummy);
         if(n < 0) {
             long lrc;
@@ -1862,13 +1862,13 @@ readDiskObject(char *filename, struct stat *sb)
             }
             goto fail;
         }
-        
+
         rc = httpParseServerFirstLine(buf, &code, &dummy, NULL);
         if(rc < 0)
             goto fail;
 
         rc = httpParseHeaders(0, NULL, buf, rc, NULL,
-                              NULL, &length, NULL, NULL, NULL, 
+                              NULL, &length, NULL, NULL, NULL,
                               &date, &last_modified, &expires, &age,
                               &atime, &body_offset, NULL,
                               NULL, NULL, NULL, NULL, &location, NULL, NULL);
@@ -1876,7 +1876,7 @@ readDiskObject(char *filename, struct stat *sb)
             goto fail;
         if(body_offset < 0)
             body_offset = n;
-    
+
         size = sb->st_size - body_offset;
         if(size < 0)
             size = 0;
@@ -1903,7 +1903,7 @@ readDiskObject(char *filename, struct stat *sb)
     dobject = malloc(sizeof(DiskObjectRec));
     if(!dobject)
         goto fail;
-    
+
     fn = strdup(filename);
     if(!fn)
         goto fail;
@@ -1935,8 +1935,8 @@ readDiskObject(char *filename, struct stat *sb)
     if(fd >= 0) close(fd);
     if(location) free(location);
     return NULL;
-}    
-    
+}
+
 
 DiskObjectPtr
 processObject(DiskObjectPtr dobjects, char *filename, struct stat *sb)
@@ -2094,7 +2094,7 @@ insertDirs(DiskObjectPtr from)
     }
     return from;
 }
-        
+
 void
 indexDiskObjects(FILE *out, const char *root, int recursive)
 {
@@ -2230,7 +2230,7 @@ indexDiskObjects(FILE *out, const char *root, int recursive)
                 } else {
                     fprintf(out, "<td></td>");
                 }
-                
+
                 if(dobject->date >= 0) {
                     struct tm *tm = gmtime(&dobject->date);
                     if(tm == NULL)
@@ -2323,7 +2323,7 @@ copyFile(int from, char *filename, int n)
                 if(rc < 0)
                     do_log_error(L_ERROR, errno, "Couldn't extend file");
                 else
-                    do_log(L_ERROR, 
+                    do_log(L_ERROR,
                            "Couldn't extend file: "
                            "unexpected offset %d != %d + %d.\n",
                            rc, offset, nread);
@@ -2365,13 +2365,13 @@ expireFile(char *filename, struct stat *sb,
                    filename);
             t = current_time.tv_sec;
         }
-        
+
         if(t > current_time.tv_sec - diskCacheUnlinkTime &&
            (sb->st_size < diskCacheTruncateSize ||
             t > current_time.tv_sec - diskCacheTruncateTime))
             return ret;
     }
-    
+
     (*considered)++;
 
     dobject = readDiskObject(filename, sb);
@@ -2388,16 +2388,16 @@ expireFile(char *filename, struct stat *sb,
             return 0;
         }
     }
-    
+
     t = dobject->access;
     if(t < 0) t = dobject->age;
     if(t < 0) t = dobject->date;
-    
+
     if(t > current_time.tv_sec)
-        do_log(L_WARN, 
+        do_log(L_WARN,
                "Disk entry %s (%s) has access time in the future.\n",
                scrub(dobject->location), scrub(dobject->filename));
-    
+
     if(t < current_time.tv_sec - diskCacheUnlinkTime) {
         rc = unlink(dobject->filename);
         if(rc < 0) {
@@ -2407,8 +2407,8 @@ expireFile(char *filename, struct stat *sb,
             (*unlinked)++;
             ret = 0;
         }
-    } else if(dobject->size > 
-              diskCacheTruncateSize + 4 * dobject->body_offset && 
+    } else if(dobject->size >
+              diskCacheTruncateSize + 4 * dobject->body_offset &&
               t < current_time.tv_sec - diskCacheTruncateTime) {
         /* We need to copy rather than simply truncate in place: the
            latter would confuse a running polipo. */
@@ -2434,7 +2434,7 @@ expireFile(char *filename, struct stat *sb,
     free(dobject);
     return ret;
 }
-    
+
 void
 expireDiskObjects()
 {
@@ -2446,7 +2446,7 @@ expireDiskObjects()
     int dirs = 0, rmdirs = 0;
     long left = 0, total = 0;
 
-    if(diskCacheRoot == NULL || 
+    if(diskCacheRoot == NULL ||
        diskCacheRoot->length <= 0 || diskCacheRoot->string[0] != '/')
         return;
 
@@ -2490,7 +2490,7 @@ expireDiskObjects()
             }
 
             if(!S_ISREG(fe->fts_statp->st_mode)) {
-                do_log(L_ERROR, "Unexpected file %s type 0%o.\n", 
+                do_log(L_ERROR, "Unexpected file %s type 0%o.\n",
                        fe->fts_accpath, (unsigned int)fe->fts_statp->st_mode);
                 continue;
             }

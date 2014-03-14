@@ -215,7 +215,7 @@ THE SOFTWARE.
 
 #include "mingw.h"
 
-#include "ftsimport.h"
+#include "../vendor/fts/ftsimport.h"
 #include "atom.h"
 #include "util.h"
 #include "config.h"

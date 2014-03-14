@@ -9,6 +9,9 @@ MANDIR = $(PREFIX)/man
 INFODIR = $(PREFIX)/info
 LOCAL_ROOT = /usr/share/polipo/www
 DISK_CACHE_ROOT = /var/cache/polipo
+SRCDIR = src
+OBJDIR = obj
+VENDORDIR = vendor
 
 BUILD_LUA = make clean ansi CFLAGS='-ULUA_DL_DLOPEN'
 
@@ -71,24 +74,26 @@ DEFINES = $(FILE_DEFINES) $(PLATFORM_DEFINES)
 
 CFLAGS = $(MD5INCLUDES) $(CDEBUGFLAGS) $(DEFINES) $(EXTRA_DEFINES)
 
-SRCS = util.c event.c io.c chunk.c atom.c object.c log.c diskcache.c main.c \
-       config.c local.c http.c client.c server.c auth.c tunnel.c \
-       http_parse.c parse_time.c dns.c forbidden.c \
-       md5import.c md5.c ftsimport.c fts_compat.c socks.c mingw.c \
-       mod_lua.c mod_lua_api.c
+SRCS := $(shell find $(SRCDIR) -name '*.c')
+OBJS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
+VENDOR_OBJS = $(VENDORDIR)/fts/ftsimport.o $(VENDORDIR)/md5/md5import.o
 
-OBJS = util.o event.o io.o chunk.o atom.o object.o log.o diskcache.o main.o \
-       config.o local.o http.o client.o server.o auth.o tunnel.o \
-       http_parse.o parse_time.o dns.o forbidden.o \
-       md5import.o ftsimport.o socks.o mingw.o \
-       mod_lua.o mod_lua_api.o
+polipo$(EXE): lua $(OBJS) $(VENDOR_OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o polipo$(EXE) $(OBJS) $(VENDOR_OBJS) $(MD5LIBS) $(LDLIBS)
 
-polipo$(EXE): lua $(OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o polipo$(EXE) $(OBJS) $(MD5LIBS) $(LDLIBS)
+$(OBJS): | obj
 
-ftsimport.o: ftsimport.c fts_compat.c
+obj:
+	@mkdir -p $@
 
-md5import.o: md5import.c md5.c
+$(OBJDIR)/%.o : $(SRCDIR)/%.c
+	@echo $(SRCS)
+	@echo $<
+	@$(CC) $(CFLAGS) -c $< -o $@ $(MD5LIBS)
+
+ftsimport.o: $(VENDORDIR)/fts/%.c
+
+md5import.o: $(VENDORDIR)/md5/%.c
 
 .PHONY: all install install.binary install.man
 
@@ -138,19 +143,16 @@ polipo.dvi: polipo.texi
 polipo.man.html: polipo.man
 	rman -f html polipo.man > polipo.man.html
 
-TAGS: $(SRCS)
-	etags $(SRCS)
+.PHONY: lua lua_clean clean
 
 lua:
 	cd $(LUA_DIR) && $(MAKE) $(LUA_PLATFORM)
-
-.PHONY: lua_clean clean
 
 lua_clean:
 	cd $(LUA_DIR) && $(MAKE) clean
 
 clean: lua_clean
-	-rm -f polipo$(EXE) *.o *~ core TAGS gmon.out
+	-rm -f polipo$(EXE) $(OBJDIR)/*.o *~ core TAGS gmon.out
 	-rm -f polipo.cp polipo.fn polipo.log polipo.vr
 	-rm -f polipo.cps polipo.info* polipo.pg polipo.toc polipo.vrs
 	-rm -f polipo.aux polipo.dvi polipo.ky polipo.ps polipo.tp

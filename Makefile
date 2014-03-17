@@ -23,9 +23,9 @@ BUILD_LUA = make clean ansi CFLAGS='-ULUA_DL_DLOPEN'
 
 # CC = gcc
 CDEBUGFLAGS = -Os -ggdb -Wall -fno-strict-aliasing \
-  -I$(LUA_SRC_DIR)
+	-I$(LUA_SRC_DIR)
 
-LDFLAGS = $(LUA_SRC_DIR)/liblua.a
+LDFLAGS = $(LUA_SRC_DIR)/liblua.a -lm
 # To compile on a pure POSIX system:
 
 # CC = c89
@@ -51,7 +51,7 @@ LDFLAGS = $(LUA_SRC_DIR)/liblua.a
 # LDLIBS = -lws2_32
 
 FILE_DEFINES = -DLOCAL_ROOT=\"$(LOCAL_ROOT)/\" \
-               -DDISK_CACHE_ROOT=\"$(DISK_CACHE_ROOT)/\"
+							 -DDISK_CACHE_ROOT=\"$(DISK_CACHE_ROOT)/\"
 
 # You may optionally also add any of the following to DEFINES:
 #
@@ -79,7 +79,7 @@ OBJS := $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
 VENDOR_OBJS = $(VENDORDIR)/fts/ftsimport.o $(VENDORDIR)/md5/md5import.o
 
 polipo$(EXE): lua $(OBJS) $(VENDOR_OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o polipo$(EXE) $(OBJS) $(VENDOR_OBJS) $(MD5LIBS) $(LDLIBS)
+	$(CC) $(CFLAGS) -o polipo$(EXE) $(OBJS) $(VENDOR_OBJS) $(MD5LIBS) $(LDLIBS) $(LDFLAGS)
 
 $(OBJS): | obj
 
@@ -87,7 +87,6 @@ obj:
 	@mkdir -p $@
 
 $(OBJDIR)/%.o : $(SRCDIR)/%.c
-	@echo $(SRCS)
 	@echo $<
 	@$(CC) $(CFLAGS) -c $< -o $@ $(MD5LIBS)
 

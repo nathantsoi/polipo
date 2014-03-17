@@ -61,6 +61,7 @@ int disableVia = 1;
 int proxyOffline = 0;
 int relaxTransparency = 0;
 AtomPtr proxyAddress = NULL;
+AtomPtr monitorPath = NULL;
 
 static int timeoutSetter(ConfigVariablePtr var, void *value);
 
@@ -68,6 +69,7 @@ void
 preinitHttp()
 {
     proxyAddress = internAtom("127.0.0.1");
+    monitorPath = internAtom("/ok");
     CONFIG_VARIABLE_SETTABLE(disableProxy, CONFIG_BOOLEAN, configIntSetter,
                              "Whether to be a web server only.");
     CONFIG_VARIABLE_SETTABLE(proxyOffline, CONFIG_BOOLEAN, configIntSetter,
@@ -79,6 +81,8 @@ preinitHttp()
                     "The TCP port on which the proxy listens.");
     CONFIG_VARIABLE(proxyAddress, CONFIG_ATOM_LOWER,
                     "The IP address on which the proxy listens.");
+    CONFIG_VARIABLE(monitorPath, CONFIG_ATOM_LOWER,
+                    "This path will return a head 200 for a loadbalancer's monitor");
     CONFIG_VARIABLE_SETTABLE(proxyName, CONFIG_ATOM_LOWER, configAtomSetter,
                              "The name by which the proxy is known.");
     CONFIG_VARIABLE_SETTABLE(clientTimeout, CONFIG_TIME, 

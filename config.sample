@@ -17,6 +17,10 @@
 # proxyAddress = "::0"        # both IPv4 and IPv6
 # proxyAddress = "0.0.0.0"    # IPv4 only
 
+# Uncomment this to change the load balancer http monitor path from the default /ok
+
+# monitorPath = "/ok"
+
 # If you do that, you'll want to restrict the set of hosts allowed to
 # connect:
 

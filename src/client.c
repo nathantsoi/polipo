@@ -22,7 +22,9 @@ THE SOFTWARE.
 
 #include "polipo.h"
 
-static int 
+extern AtomPtr monitorPath;
+
+static int
 httpAcceptAgain(TimeEventHandlerPtr event)
 {
     FdEventHandlerPtr newevent;
@@ -655,6 +657,12 @@ httpClientHandlerHeaders(FdEventHandlerPtr event, StreamRequestPtr srequest,
 
     if(connection->version != HTTP_UNKNOWN && version != connection->version) {
         do_log(L_WARN, "Client version changed!\n");
+    }
+
+    if(method == METHOD_OPTIONS && strcmp(url->string, monitorPath->string) == 0) {
+      code = 200;
+      message = internAtom("OK");
+      goto fail;
     }
 
     connection->version = version;

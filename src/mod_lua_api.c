@@ -32,7 +32,8 @@ const char * METHOD_STRINGS[] =
   "CONDITIONAL_GET",
   "CONNECT",
   "POST",
-  "PUT"
+  "PUT",
+  "OPTIONS"
 };
 
 void

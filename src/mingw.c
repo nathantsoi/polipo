@@ -57,13 +57,13 @@ int win32_snprintf(char* dest, size_t count, const char* format, ...)
     return r;
 }
 
-/* 
+/*
  * Check whether "cp" is a valid ascii representation of an Internet address
  * and convert to a binary address.  Returns 1 if the address is valid, 0 if
  * not.  This replaces inet_addr, the return value from which cannot
  * distinguish between failure and a local broadcast address.
  *
- * This implementation of the standard inet_aton() function was copied 
+ * This implementation of the standard inet_aton() function was copied
  * (with trivial modifications) from the OpenBSD project.
  */
 int
@@ -208,25 +208,25 @@ int win32_poll(struct pollfd *fds, unsigned int nfds, int timo)
     FD_ZERO(&ofds);
     FD_ZERO(&efds);
     for (i = 0, op = ip = 0; i < nfds; ++i) {
-	fds[i].revents = 0;
-	if(fds[i].events & (POLLIN|POLLPRI)) {
-		ip = &ifds;
-		FD_SET(fds[i].fd, ip);
-	}
-	if(fds[i].events & POLLOUT) {
-		op = &ofds;
-		FD_SET(fds[i].fd, op);
-	}
-	FD_SET(fds[i].fd, &efds);
-    } 
+  fds[i].revents = 0;
+  if(fds[i].events & (POLLIN|POLLPRI)) {
+    ip = &ifds;
+    FD_SET(fds[i].fd, ip);
+  }
+  if(fds[i].events & POLLOUT) {
+    op = &ofds;
+    FD_SET(fds[i].fd, op);
+  }
+  FD_SET(fds[i].fd, &efds);
+    }
 
     /* Set up the timeval structure for the timeout parameter */
     if(timo < 0) {
-	toptr = 0;
+  toptr = 0;
     } else {
-	toptr = &timeout;
-	timeout.tv_sec = timo / 1000;
-	timeout.tv_usec = (timo - timeout.tv_sec * 1000) * 1000;
+  toptr = &timeout;
+  timeout.tv_sec = timo / 1000;
+  timeout.tv_usec = (timo - timeout.tv_sec * 1000) * 1000;
     }
 
 #ifdef DEBUG_POLL
@@ -239,21 +239,21 @@ int win32_poll(struct pollfd *fds, unsigned int nfds, int timo)
 #endif
 
     if(rc <= 0)
-	return rc;
+      return rc;
 
     if(rc > 0) {
         for (i = 0; i < nfds; ++i) {
             int fd = fds[i].fd;
-    	if(fds[i].events & (POLLIN|POLLPRI) && FD_ISSET(fd, &ifds))
-    		fds[i].revents |= POLLIN;
-    	if(fds[i].events & POLLOUT && FD_ISSET(fd, &ofds))
-    		fds[i].revents |= POLLOUT;
-    	if(FD_ISSET(fd, &efds))
-    		/* Some error was detected ... should be some way to know. */
-    		fds[i].revents |= POLLHUP;
+          if(fds[i].events & (POLLIN|POLLPRI) && FD_ISSET(fd, &ifds))
+            fds[i].revents |= POLLIN;
+          if(fds[i].events & POLLOUT && FD_ISSET(fd, &ofds))
+            fds[i].revents |= POLLOUT;
+          if(FD_ISSET(fd, &efds))
+            /* Some error was detected ... should be some way to know. */
+            fds[i].revents |= POLLHUP;
 #ifdef DEBUG_POLL
-        printf("%d %d %d revent = %x\n", 
-                FD_ISSET(fd, &ifds), FD_ISSET(fd, &ofds), FD_ISSET(fd, &efds), 
+        printf("%d %d %d revent = %x\n",
+                FD_ISSET(fd, &ifds), FD_ISSET(fd, &ofds), FD_ISSET(fd, &efds),
                 fds[i].revents
         );
 #endif

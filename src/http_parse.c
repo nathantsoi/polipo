@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 static int getNextWord(const char *buf, int i, int *x_return, int *y_return);
 static int getNextToken(const char *buf, int i, int *x_return, int *y_return);
-static int getNextTokenInList(const char *buf, int i, 
+static int getNextTokenInList(const char *buf, int i,
                               int *x_return, int *y_return,
                               int *z_return, int *t_return,
                               int *end_return);
@@ -34,11 +34,11 @@ static AtomPtr atomConnection, atomProxyConnection, atomContentLength,
     atomReferer, atomProxyAuthenticate, atomProxyAuthorization,
     atomKeepAlive, atomTrailer, atomUpgrade, atomDate, atomExpires,
     atomIfModifiedSince, atomIfUnmodifiedSince, atomIfRange, atomLastModified,
-    atomIfMatch, atomIfNoneMatch, atomAge, atomTransferEncoding, 
+    atomIfMatch, atomIfNoneMatch, atomAge, atomTransferEncoding,
     atomETag, atomCacheControl, atomPragma, atomContentRange, atomRange,
     atomVia, atomVary, atomExpect, atomAuthorization,
     atomSetCookie, atomCookie, atomCookie2,
-    atomXPolipoDate, atomXPolipoAccess, atomXPolipoLocation, 
+    atomXPolipoDate, atomXPolipoAccess, atomXPolipoLocation,
     atomXPolipoBodyOffset;
 
 AtomPtr atomContentType, atomContentEncoding;
@@ -159,7 +159,7 @@ skipComment(const char *restrict buf, int i)
     }
     return i;
 }
-            
+
 
 static int
 skipWhitespace(const char *restrict buf, int i)
@@ -242,7 +242,7 @@ getNextToken(const char *restrict buf, int i, int *x_return, int *y_return)
 }
 
 static int
-getNextETag(const char * restrict buf, int i, 
+getNextETag(const char * restrict buf, int i,
             int *x_return, int *y_return, int *weak_return)
 {
     int weak = 0;
@@ -274,7 +274,7 @@ getNextETag(const char * restrict buf, int i,
 }
 
 static int
-getNextTokenInList(const char *restrict buf, int i, 
+getNextTokenInList(const char *restrict buf, int i,
                    int *x_return, int *y_return,
                    int *z_return, int *t_return,
                    int *end_return)
@@ -349,7 +349,7 @@ skipEol(const char *restrict buf, int i)
         return -1;
     }
 }
-    
+
 static int
 skipToEol(const char *restrict buf, int i, int *start_return)
 {
@@ -370,7 +370,7 @@ skipToEol(const char *restrict buf, int i, int *start_return)
 }
 
 static int
-getHeaderValue(const char *restrict buf, int start, 
+getHeaderValue(const char *restrict buf, int start,
                int *value_start_return, int *value_end_return)
 {
     int i, j, k;
@@ -390,7 +390,7 @@ getHeaderValue(const char *restrict buf, int start,
     *value_end_return = k;
     return j;
 }
-    
+
 int
 httpParseClientFirstLine(const char *restrict buf, int offset,
                          int *method_return,
@@ -446,7 +446,7 @@ httpParseClientFirstLine(const char *restrict buf, int offset,
 
     eol = skipEol(buf, y);
     if(eol < 0) return -1;
-        
+
     *method_return = method;
     if(url_return)
         *url_return = url;
@@ -457,7 +457,7 @@ httpParseClientFirstLine(const char *restrict buf, int offset,
 }
 
 int
-httpParseServerFirstLine(const char *restrict buf, 
+httpParseServerFirstLine(const char *restrict buf,
                          int *status_return,
                          int *version_return,
                          AtomPtr *message_return)
@@ -466,7 +466,7 @@ httpParseServerFirstLine(const char *restrict buf,
     int x, y, eol;
     int status;
     int version = HTTP_UNKNOWN;
-    
+
     i = getNextWord(buf, 0, &x, &y);
     if(i < 0)
         return -1;
@@ -485,7 +485,7 @@ httpParseServerFirstLine(const char *restrict buf,
 
     i = skipToEol(buf, y, &eol);
     if(i < 0) return -1;
-        
+
     *status_return = status;
     *version_return = version;
     if(message_return) {
@@ -566,7 +566,7 @@ parseHeaderLine(const char *restrict buf, int start,
 }
 
 int
-findEndOfHeaders(const char *restrict buf, int from, int to, int *body_return) 
+findEndOfHeaders(const char *restrict buf, int from, int to, int *body_return)
 {
     int i = from;
     int eol = 0;
@@ -599,7 +599,7 @@ findEndOfHeaders(const char *restrict buf, int from, int to, int *body_return)
 }
 
 static int
-parseContentRange(const char *restrict buf, int i, 
+parseContentRange(const char *restrict buf, int i,
                   int *from_return, int *to_return, int *full_len_return)
 {
     int j;
@@ -646,7 +646,7 @@ parseContentRange(const char *restrict buf, int i,
 }
 
 static int
-parseRange(const char *restrict buf, int i, 
+parseRange(const char *restrict buf, int i,
            int *from_return, int *to_return)
 {
     int j;
@@ -669,7 +669,7 @@ parseRange(const char *restrict buf, int i,
         return -1;
     i++;
     j = parseInt(buf, i, &to);
-    if(j < 0) 
+    if(j < 0)
         to = -1;
     else {
         to = to + 1;
@@ -683,7 +683,7 @@ parseRange(const char *restrict buf, int i,
 }
 
 static void
-parseCacheControl(const char *restrict buf, 
+parseCacheControl(const char *restrict buf,
                   int token_start, int token_end,
                   int v_start, int v_end, int *age_return)
 {
@@ -764,7 +764,7 @@ httpParseHeaders(int client, AtomPtr url,
     char *hbuf = hbuf_small;
     int hbuf_size = 512, hbuf_length = 0;
     int i, j,
-        name_start, name_end, value_start, value_end, 
+        name_start, name_end, value_start, value_end,
         token_start, token_end, end;
     AtomPtr name = NULL;
     time_t date = -1, last_modified = -1, expires = -1, polipo_age = -1,
@@ -786,7 +786,7 @@ httpParseHeaders(int client, AtomPtr url,
     AtomListPtr hopToHop = NULL;
     HTTPRangeRec range = {-1, -1, -1}, content_range = {-1, -1, -1};
     int haveCacheControl = 0;
- 
+
 #define RESIZE_HBUF() \
     do { \
         hbuf = resize_hbuf(hbuf, &hbuf_size, hbuf_small); \
@@ -799,7 +799,7 @@ httpParseHeaders(int client, AtomPtr url,
     cache_control.s_maxage = -1;
     cache_control.min_fresh = -1;
     cache_control.max_stale = -1;
-    
+
     i = start;
 
     while(1) {
@@ -819,20 +819,20 @@ httpParseHeaders(int client, AtomPtr url,
         name = internAtomLowerN(buf + name_start, name_end - name_start);
 
         if(name == atomConnection) {
-            j = getNextTokenInList(buf, value_start, 
+            j = getNextTokenInList(buf, value_start,
                                    &token_start, &token_end, NULL, NULL,
                                    &end);
             while(1) {
                 if(j < 0) {
                     do_log(L_ERROR, "Couldn't parse Connection: ");
-                    do_log_n(L_ERROR, buf + value_start, 
+                    do_log_n(L_ERROR, buf + value_start,
                              value_end - value_start);
                     do_log(L_ERROR, ".\n");
                     goto fail;
                 }
                 if(token_compare(buf, token_start, token_end, "close")) {
                     persistent = 0;
-                } else if(token_compare(buf, token_start, token_end, 
+                } else if(token_compare(buf, token_start, token_end,
                                         "keep-alive")) {
                     persistent = 1;
                 } else {
@@ -848,7 +848,7 @@ httpParseHeaders(int client, AtomPtr url,
                 }
                 if(end)
                     break;
-                j = getNextTokenInList(buf, j, 
+                j = getNextTokenInList(buf, j,
                                        &token_start, &token_end, NULL, NULL,
                                        &end);
             }
@@ -858,11 +858,11 @@ httpParseHeaders(int client, AtomPtr url,
         releaseAtom(name);
         name = NULL;
     }
-    
+
     i = start;
 
     while(1) {
-        i = parseHeaderLine(buf, i, 
+        i = parseHeaderLine(buf, i,
                             &name_start, &name_end, &value_start, &value_end);
         if(i < 0) {
             do_log(L_ERROR, "Couldn't find end of header line.\n");
@@ -881,15 +881,15 @@ httpParseHeaders(int client, AtomPtr url,
         }
 
         name = internAtomLowerN(buf + name_start, name_end - name_start);
-        
+
         if(name == atomProxyConnection) {
-            j = getNextTokenInList(buf, value_start, 
+            j = getNextTokenInList(buf, value_start,
                                    &token_start, &token_end, NULL, NULL,
                                    &end);
             while(1) {
                 if(j < 0) {
                     do_log(L_WARN, "Couldn't parse Proxy-Connection:");
-                    do_log_n(L_WARN, buf + value_start, 
+                    do_log_n(L_WARN, buf + value_start,
                              value_end - value_start);
                     do_log(L_WARN, ".\n");
                     persistent = 0;
@@ -897,13 +897,13 @@ httpParseHeaders(int client, AtomPtr url,
                 }
                 if(token_compare(buf, token_start, token_end, "close")) {
                     persistent = 0;
-                } else if(token_compare(buf, token_start, token_end, 
+                } else if(token_compare(buf, token_start, token_end,
                                         "keep-alive")) {
                     persistent = 1;
                 }
                 if(end)
                     break;
-                j = getNextTokenInList(buf, j, 
+                j = getNextTokenInList(buf, j,
                                        &token_start, &token_end, NULL, NULL,
                                        &end);
             }
@@ -919,7 +919,7 @@ httpParseHeaders(int client, AtomPtr url,
                 len = strtol(buf + value_start, &endptr, 10);
                 if(errno == ERANGE || endptr <= buf + value_start) {
                     do_log(L_WARN, "Couldn't parse Content-Length: \n");
-                    do_log_n(L_WARN, buf + value_start, 
+                    do_log_n(L_WARN, buf + value_start,
                              value_end - value_start);
                     do_log(L_WARN, ".\n");
                     len = -1;
@@ -936,7 +936,7 @@ httpParseHeaders(int client, AtomPtr url,
             }
         } else if(name == atomReferer) {
             int h;
-            if(censorReferer == 0 || 
+            if(censorReferer == 0 ||
                (censorReferer == 1 && url != NULL &&
                 urlSameHost(url->string, url->length,
                             buf + value_start, value_end - value_start))) {
@@ -955,7 +955,7 @@ httpParseHeaders(int client, AtomPtr url,
             do_log(L_ERROR, "Trailers or upgrade present.\n");
             goto fail;
         } else if(name == atomDate || name == atomExpires ||
-                  name == atomIfModifiedSince || 
+                  name == atomIfModifiedSince ||
                   name == atomIfUnmodifiedSince ||
                   name == atomLastModified ||
                   name == atomXPolipoDate || name == atomXPolipoAccess) {
@@ -1064,8 +1064,8 @@ httpParseHeaders(int client, AtomPtr url,
             }
         } else if(name == atomCacheControl) {
             int v_start, v_end;
-            j = getNextTokenInList(buf, value_start, 
-                                   &token_start, &token_end, 
+            j = getNextTokenInList(buf, value_start,
+                                   &token_start, &token_end,
                                    &v_start, &v_end,
                                    &end);
             while(1) {
@@ -1079,13 +1079,13 @@ httpParseHeaders(int client, AtomPtr url,
                 } else if(token_compare(buf, token_start, token_end,
                                         "public")) {
                     cache_control.flags |= CACHE_PUBLIC;
-                } else if(token_compare(buf, token_start, token_end, 
+                } else if(token_compare(buf, token_start, token_end,
                                         "private")) {
                     cache_control.flags |= CACHE_PRIVATE;
-                } else if(token_compare(buf, token_start, token_end, 
+                } else if(token_compare(buf, token_start, token_end,
                                         "no-store")) {
                     cache_control.flags |= CACHE_NO_STORE;
-                } else if(token_compare(buf, token_start, token_end, 
+                } else if(token_compare(buf, token_start, token_end,
                                         "no-transform")) {
                     cache_control.flags |= CACHE_NO_TRANSFORM;
                 } else if(token_compare(buf, token_start, token_end,
@@ -1093,7 +1093,7 @@ httpParseHeaders(int client, AtomPtr url,
                           token_compare(buf, token_start, token_end,
                                         "must-validate")) { /* losers */
                     cache_control.flags |= CACHE_MUST_REVALIDATE;
-                } else if(token_compare(buf, token_start, token_end, 
+                } else if(token_compare(buf, token_start, token_end,
                                         "proxy-revalidate")) {
                     cache_control.flags |= CACHE_PROXY_REVALIDATE;
                 } else if(token_compare(buf, token_start, token_end,
@@ -1117,25 +1117,25 @@ httpParseHeaders(int client, AtomPtr url,
                                       &cache_control.max_stale);
                 } else {
                     do_log(L_WARN, "Unsupported Cache-Control directive ");
-                    do_log_n(L_WARN, buf + token_start, 
+                    do_log_n(L_WARN, buf + token_start,
                              (v_end >= 0 ? v_end : token_end) - token_start);
                     do_log(L_WARN, " -- ignored.\n");
                 }
                 if(end)
                     break;
-                j = getNextTokenInList(buf, j, 
+                j = getNextTokenInList(buf, j,
                                        &token_start, &token_end,
                                        &v_start, &v_end,
                                        &end);
             }
         } else if(name == atomContentRange) {
             if(!client) {
-                j = parseContentRange(buf, value_start, 
-                                      &content_range.from, &content_range.to, 
+                j = parseContentRange(buf, value_start,
+                                      &content_range.from, &content_range.to,
                                       &content_range.full_length);
                 if(j < 0) {
                     do_log(L_ERROR, "Couldn't parse Content-Range: ");
-                    do_log_n(L_ERROR, buf + value_start, 
+                    do_log_n(L_ERROR, buf + value_start,
                              value_end - value_start);
                     do_log(L_ERROR, "\n");
                     goto fail;
@@ -1157,7 +1157,7 @@ httpParseHeaders(int client, AtomPtr url,
             }
         } else if(name == atomXPolipoLocation) {
             if(location_return) {
-                location = 
+                location =
                     strdup_n(buf + value_start, value_end - value_start);
                 if(location == NULL) {
                     do_log(L_ERROR, "Couldn't allocate location.\n");
@@ -1189,7 +1189,7 @@ httpParseHeaders(int client, AtomPtr url,
             }
         } else if(name == atomExpect) {
             if(expect_return) {
-                expect = internAtomLowerN(buf + value_start, 
+                expect = internAtomLowerN(buf + value_start,
                                           value_end - value_start);
                 if(expect == NULL) {
                     do_log(L_ERROR, "Couldn't allocate expect.\n");
@@ -1200,11 +1200,11 @@ httpParseHeaders(int client, AtomPtr url,
             if(!client && name == atomContentType) {
                 if(token_compare(buf, value_start, value_end,
                                  "multipart/byteranges")) {
-                    do_log(L_ERROR, 
+                    do_log(L_ERROR,
                            "Server returned multipart/byteranges -- yuck!\n");
                     goto fail;
                 }
-            } 
+            }
             if(name == atomVary) {
                 if(!token_compare(buf, value_start, value_end, "host") &&
                    !token_compare(buf, value_start, value_end, "*")) {
@@ -1217,7 +1217,7 @@ httpParseHeaders(int client, AtomPtr url,
                 cache_control.flags |= CACHE_VARY;
             } else if(name == atomAuthorization) {
                 cache_control.flags |= CACHE_AUTHORIZATION;
-            } 
+            }
 
             if(name == atomPragma) {
                 /* Pragma is only defined for the client, and the only
@@ -1246,7 +1246,7 @@ httpParseHeaders(int client, AtomPtr url,
                 }
             }
             if(!client &&
-               (name == atomSetCookie || 
+               (name == atomSetCookie ||
                 name == atomCookie || name == atomCookie2))
                 cache_control.flags |= CACHE_COOKIE;
 
@@ -1264,7 +1264,7 @@ httpParseHeaders(int client, AtomPtr url,
                     hbuf[hbuf_length++] = '\n';
                     do {
                         h = snnprint_n(hbuf, hbuf_length, hbuf_size,
-                                       buf + name_start, 
+                                       buf + name_start,
                                        value_end - name_start);
                         if(h < 0) RESIZE_HBUF();
                     } while(h < 0);
@@ -1277,7 +1277,7 @@ httpParseHeaders(int client, AtomPtr url,
     }
 
     if(headers_return) {
-        AtomPtr pheaders = NULL; 
+        AtomPtr pheaders = NULL;
         pheaders = internAtomN(hbuf, hbuf_length);
         if(!pheaders)
             goto fail;
@@ -1316,7 +1316,7 @@ httpParseHeaders(int client, AtomPtr url,
     } else {
         assert(!im && !inm);
     }
-            
+
     if(te_return) *te_return = te;
     if(date_return) *date_return = date;
     if(last_modified_return) *last_modified_return = last_modified;
@@ -1369,7 +1369,7 @@ httpParseHeaders(int client, AtomPtr url,
     if(expect) releaseAtom(expect);
     if(auth) releaseAtom(auth);
     if(hopToHop) destroyAtomList(hopToHop);
-        
+
     return -1;
 #undef RESIZE_HBUF
 }

@@ -67,8 +67,8 @@ int allocateFdEventNum(int fd);
 void deallocateFdEventNum(int i);
 void timeToSleep(struct timeval *);
 void runTimeEventQueue(void);
-FdEventHandlerPtr makeFdEvent(int fd, int poll_events, 
-                              int (*handler)(int, FdEventHandlerPtr), 
+FdEventHandlerPtr makeFdEvent(int fd, int poll_events,
+                              int (*handler)(int, FdEventHandlerPtr),
                               int dsize, void *data);
 FdEventHandlerPtr registerFdEvent(int fd, int poll_events,
                                   int (*handler)(int, FdEventHandlerPtr),
@@ -81,7 +81,7 @@ void eventLoop(void);
 ConditionPtr makeCondition(void);
 void initCondition(ConditionPtr);
 void signalCondition(ConditionPtr condition);
-ConditionHandlerPtr 
+ConditionHandlerPtr
 conditionWait(ConditionPtr condition,
               int (*handler)(int, ConditionHandlerPtr),
               int dsize, void *data);

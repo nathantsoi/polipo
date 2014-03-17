@@ -35,7 +35,7 @@ int httpParseClientFirstLine(const char *buf, int offset,
                              int *method_return,
                              AtomPtr *url_return,
                              int *version_return);
-int httpParseServerFirstLine(const char *buf, 
+int httpParseServerFirstLine(const char *buf,
                              int *status_return,
                              int *version_return,
                              AtomPtr *message_return);
@@ -43,7 +43,7 @@ int httpParseServerFirstLine(const char *buf,
 int findEndOfHeaders(const char *buf, int from, int to, int *body_return);
 
 int httpParseHeaders(int, AtomPtr, const char *, int, HTTPRequestPtr,
-                     AtomPtr*, int*, CacheControlPtr, 
+                     AtomPtr*, int*, CacheControlPtr,
                      HTTPConditionPtr *, int*,
                      time_t*, time_t*, time_t*, time_t*, time_t*,
                      int*, int*, char**, AtomPtr*,

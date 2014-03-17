@@ -57,7 +57,7 @@ typedef struct _ConfigVariable {
 #define CONFIG_VARIABLE_SETTABLE(name, type, setter, help) \
     declareConfigVariable(internAtom(#name), type, &name, setter, help)
 
-void declareConfigVariable(AtomPtr name, int type, void *value, 
+void declareConfigVariable(AtomPtr name, int type, void *value,
                            int (*setter)(ConfigVariablePtr, void*),
                            char *help);
 void printConfigVariables(FILE *out, int html);

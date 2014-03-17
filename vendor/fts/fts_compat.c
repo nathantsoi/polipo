@@ -346,7 +346,7 @@ fts_read(FTS *fts)
         fts->ftsent.fts_info = FTS_DEFAULT;
         goto done;
     }
-    
+
  done:
     if(fts->cwd == NULL)
         fts->cwd = getcwd_a();

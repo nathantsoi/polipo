@@ -36,7 +36,7 @@ do_tunnel(int fd, char *buf, int offset, int len, AtomPtr url)
                               1, NULL, url->string, url->length, NULL);
     releaseAtom(url);
     if(n >= 0) {
-        /* This is completely wrong.  The write is non-blocking, and we 
+        /* This is completely wrong.  The write is non-blocking, and we
            don't reschedule it if it fails.  But then, if the write
            blocks, we'll simply drop the connection with no error message. */
         write(fd, buf, n);
@@ -79,7 +79,7 @@ static void
 logTunnel(TunnelPtr tunnel, int blocked)
 {
     do_log(L_TUNNEL,"tunnel %s:%d %s\n", tunnel->hostname->string, tunnel->port,
-	   blocked ? "blocked" : "allowed");
+     blocked ? "blocked" : "allowed");
 }
 
 static TunnelPtr
@@ -123,7 +123,7 @@ destroyTunnel(TunnelPtr tunnel)
     free(tunnel);
 }
 
-void 
+void
 do_tunnel(int fd, char *buf, int offset, int len, AtomPtr url)
 {
     TunnelPtr tunnel;
@@ -170,17 +170,17 @@ do_tunnel(int fd, char *buf, int offset, int len, AtomPtr url)
         return;
     }
     tunnel->port = port;
-    
-    if (tunnelIsMatched(url->string, url->length, 
-			tunnel->hostname->string, tunnel->hostname->length)) {
+
+    if (tunnelIsMatched(url->string, url->length,
+      tunnel->hostname->string, tunnel->hostname->length)) {
         releaseAtom(url);
         tunnelError(tunnel, 404, internAtom("Forbidden tunnel"));
-	logTunnel(tunnel,1);
+        logTunnel(tunnel,1);
         return;
     }
-    
+
     logTunnel(tunnel,0);
-    
+
     releaseAtom(url);
 
     if(socksParentProxy)
@@ -201,7 +201,7 @@ tunnelDnsHandler(int status, GethostbynameRequestPtr request)
 
     if(status <= 0) {
         tunnelError(tunnel, 504,
-                    internAtomError(-status, 
+                    internAtomError(-status,
                                     "Host %s lookup failed",
                                     atomString(tunnel->hostname)));
         return 1;
@@ -341,7 +341,7 @@ bufRead(int fd, CircularBufferPtr buf,
                   fd, buf->head,
                   buf->buf, tail,
                   handler, data);
-    else 
+    else
         do_stream_2(IO_READ | IO_NOTNOW,
                     fd, buf->head,
                     buf->buf, CHUNK_SIZE,
@@ -366,12 +366,12 @@ bufWrite(int fd, CircularBufferPtr buf,
                     buf->buf, buf->head,
                     handler, data);
 }
-                    
+
 static void
 tunnelDispatch(TunnelPtr tunnel)
 {
     if(circularBufferEmpty(&tunnel->buf1)) {
-        if(tunnel->buf1.buf && 
+        if(tunnel->buf1.buf &&
            !(tunnel->flags & (TUNNEL_READER1 | TUNNEL_WRITER2))) {
             dispose_chunk(tunnel->buf1.buf);
             tunnel->buf1.buf = NULL;
@@ -389,7 +389,7 @@ tunnelDispatch(TunnelPtr tunnel)
     }
 
     if(tunnel->fd1 >= 0) {
-        if(!(tunnel->flags & (TUNNEL_READER1 | TUNNEL_EOF1)) && 
+        if(!(tunnel->flags & (TUNNEL_READER1 | TUNNEL_EOF1)) &&
            !circularBufferFull(&tunnel->buf1)) {
             tunnel->flags |= TUNNEL_READER1;
             bufRead(tunnel->fd1, &tunnel->buf1, tunnelRead1Handler, tunnel);
@@ -421,7 +421,7 @@ tunnelDispatch(TunnelPtr tunnel)
     }
 
     if(tunnel->fd2 >= 0) {
-        if(!(tunnel->flags & (TUNNEL_READER2 | TUNNEL_EOF2)) && 
+        if(!(tunnel->flags & (TUNNEL_READER2 | TUNNEL_EOF2)) &&
            !circularBufferFull(&tunnel->buf2)) {
             tunnel->flags |= TUNNEL_READER2;
             bufRead(tunnel->fd2, &tunnel->buf2, tunnelRead2Handler, tunnel);
@@ -457,7 +457,7 @@ tunnelDispatch(TunnelPtr tunnel)
 }
 
 static int
-tunnelRead1Handler(int status, 
+tunnelRead1Handler(int status,
                    FdEventHandlerPtr event, StreamRequestPtr request)
 {
     TunnelPtr tunnel = request->data;
@@ -478,7 +478,7 @@ tunnelRead1Handler(int status,
 }
 
 static int
-tunnelRead2Handler(int status, 
+tunnelRead2Handler(int status,
                    FdEventHandlerPtr event, StreamRequestPtr request)
 {
     TunnelPtr tunnel = request->data;
@@ -517,7 +517,7 @@ tunnelWrite1Handler(int status,
     tunnelDispatch(tunnel);
     return 1;
 }
-        
+
 static int
 tunnelWrite2Handler(int status,
                    FdEventHandlerPtr event, StreamRequestPtr request)
@@ -537,7 +537,7 @@ tunnelWrite2Handler(int status,
     tunnelDispatch(tunnel);
     return 1;
 }
-        
+
 static int
 tunnelError(TunnelPtr tunnel, int code, AtomPtr message)
 {

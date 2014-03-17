@@ -1687,7 +1687,7 @@ httpWriteRequest(HTTPConnectionPtr connection, HTTPRequestPtr request,
 
     n = httpPrintCacheControl(connection->reqbuf, n, bufsize,
                               alwaysAddNoTransform ? CACHE_NO_TRANSFORM : 0,
-			      &request->cache_control);
+            &request->cache_control);
     if(n < 0)
         goto fail;
 

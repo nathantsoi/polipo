@@ -166,7 +166,7 @@ void initObject(void);
 ObjectPtr findObject(int type, const void *key, int key_size);
 ObjectPtr makeObject(int type, const void *key, int key_size,
                      int public, int fromdisk,
-                     int (*request)(ObjectPtr, int, int, int, 
+                     int (*request)(ObjectPtr, int, int, int,
                                     struct _HTTPRequest*, void*), void*);
 void objectMetadataChanged(ObjectPtr object, int dirty);
 ObjectPtr retainObject(ObjectPtr);

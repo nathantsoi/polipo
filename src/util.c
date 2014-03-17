@@ -97,7 +97,7 @@ strcmp_n(const char *string, const char *buf, int n)
         return -1;
 }
 
-int 
+int
 letter(char c)
 {
     if(c >= 'A' && c <= 'Z') return 1;
@@ -183,7 +183,7 @@ atoi_n(const char *restrict string, int n, int len, int *value_return)
     return i;
 }
 
-int 
+int
 isWhitespace(const char *string)
 {
     while(*string != '\0') {
@@ -210,7 +210,7 @@ memrchr(const void *s, int c, size_t n)
 #endif
 
 int
-h2i(char h) 
+h2i(char h)
 {
     if(h >= '0' && h <= '9')
         return h - '0';
@@ -221,7 +221,7 @@ h2i(char h)
     else
         return -1;
 }
-    
+
 char
 i2h(int i)
 {
@@ -235,7 +235,7 @@ i2h(int i)
 
 /* floor(log2(x)) */
 int
-log2_floor(int x) 
+log2_floor(int x)
 {
     int i, j;
 
@@ -252,7 +252,7 @@ log2_floor(int x)
 
 /* ceil(log2(x)) */
 int
-log2_ceil(int x) 
+log2_ceil(int x)
 {
     int i, j;
 
@@ -281,7 +281,7 @@ vsprintf_a(const char *f, va_list args)
     if(rc < 0)
         return NULL;
     return r;
-    
+
 }
 
 #else
@@ -335,7 +335,7 @@ sprintf_a(const char *f, ...)
     s = vsprintf_a(f, args);
     va_end(args);
     return s;
-}    
+}
 
 unsigned int
 hash(unsigned int seed, const void *restrict key, int key_size,
@@ -502,7 +502,7 @@ expandTilde(AtomPtr filename)
     if(filename == NULL || filename->length < 1 ||
        filename->string[0] != '~' || filename->string[1] != '/')
         return filename;
-    
+
     home = getenv("HOME");
     if(home == NULL) {
         return NULL;
@@ -593,7 +593,7 @@ writePid(char *pidfile)
 
     fd = open(pidfile, O_WRONLY | O_CREAT | O_EXCL, 0666);
     if(fd < 0) {
-        do_log_error(L_ERROR, errno, 
+        do_log_error(L_ERROR, errno,
                      "Couldn't create pid file %s", pidfile);
         exit(1);
     }
@@ -734,7 +734,7 @@ insertRange(int from, int to, IntListPtr list, int i)
 
     if(list->length >= list->size) {
         int newsize = list->size * 2 + 1;
-        IntRangePtr newranges = 
+        IntRangePtr newranges =
             realloc(list->ranges, newsize * sizeof(IntRangeRec));
         if(newranges == NULL)
             return -1;
@@ -757,7 +757,7 @@ maybeMergeRanges(IntListPtr list, int i)
     int rc;
 
     while(i > 0 && list->ranges[i].from <= list->ranges[i - 1].to + 1) {
-            list->ranges[i - 1].from = 
+            list->ranges[i - 1].from =
                 MIN(list->ranges[i - 1].from, list->ranges[i].from);
             list->ranges[i - 1].to =
                 MAX(list->ranges[i - 1].to, list->ranges[i].to);
@@ -766,9 +766,9 @@ maybeMergeRanges(IntListPtr list, int i)
             i--;
     }
 
-    while(i < list->length - 1 && 
+    while(i < list->length - 1 &&
           list->ranges[i].to >= list->ranges[i + 1].from - 1) {
-            list->ranges[i + 1].from = 
+            list->ranges[i + 1].from =
                 MIN(list->ranges[i + 1].from, list->ranges[i].from);
             list->ranges[i - 1].to =
                 MAX(list->ranges[i + 1].to, list->ranges[i].to);
@@ -789,7 +789,7 @@ intListCons(int from, int to, IntListPtr list)
             break;
     }
 
-    if(i < list->length && 
+    if(i < list->length &&
        (from >= list->ranges[i].from - 1 || to <= list->ranges[i].to + 1)) {
         if(from <= list->ranges[i].from)
             list->ranges[i].from = from;

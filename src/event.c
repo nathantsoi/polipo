@@ -315,7 +315,7 @@ allocateFdEventNum(int fd)
         new_fdEvents = realloc(fdEvents, new_size * sizeof(FdEventHandlerPtr));
         if(!new_fdEvents)
             return -1;
-        new_fdEventsLast = realloc(fdEventsLast, 
+        new_fdEventsLast = realloc(fdEventsLast,
                                    new_size * sizeof(FdEventHandlerPtr));
         if(!new_fdEventsLast)
             return -1;
@@ -341,7 +341,7 @@ void
 deallocateFdEventNum(int i)
 {
     if(i < fdEventNum - 1) {
-        memmove(&poll_fds[i], &poll_fds[i + 1], 
+        memmove(&poll_fds[i], &poll_fds[i + 1],
                 (fdEventNum - i - 1) * sizeof(struct pollfd));
         memmove(&fdEvents[i], &fdEvents[i + 1],
                 (fdEventNum - i - 1) * sizeof(FdEventHandlerPtr));
@@ -352,8 +352,8 @@ deallocateFdEventNum(int i)
     fds_invalid = 1;
 }
 
-FdEventHandlerPtr 
-makeFdEvent(int fd, int poll_events, 
+FdEventHandlerPtr
+makeFdEvent(int fd, int poll_events,
             int (*handler)(int, FdEventHandlerPtr), int dsize, void *data)
 {
     FdEventHandlerPtr event;
@@ -408,8 +408,8 @@ registerFdEventHelper(FdEventHandlerPtr event)
     return event;
 }
 
-FdEventHandlerPtr 
-registerFdEvent(int fd, int poll_events, 
+FdEventHandlerPtr
+registerFdEvent(int fd, int poll_events,
                 int (*handler)(int, FdEventHandlerPtr), int dsize, void *data)
 {
     FdEventHandlerPtr event;
@@ -422,7 +422,7 @@ registerFdEvent(int fd, int poll_events,
 }
 
 static int
-recomputePollEvents(FdEventHandlerPtr event) 
+recomputePollEvents(FdEventHandlerPtr event)
 {
     int pe = 0;
     while(event) {
@@ -456,12 +456,12 @@ unregisterFdEventI(FdEventHandlerPtr event, int i)
     if(fdEvents[i] == NULL) {
         deallocateFdEventNum(i);
     } else {
-        poll_fds[i].events = recomputePollEvents(fdEvents[i]) | 
+        poll_fds[i].events = recomputePollEvents(fdEvents[i]) |
             POLLERR | POLLHUP | POLLNVAL;
     }
 }
 
-void 
+void
 unregisterFdEvent(FdEventHandlerPtr event)
 {
     int i;
@@ -481,7 +481,7 @@ runTimeEventQueue()
     TimeEventHandlerPtr event;
     int done;
 
-    while(timeEventQueue && 
+    while(timeEventQueue &&
           timeval_cmp(&timeEventQueue->time, &current_time) <= 0) {
         event = timeEventQueue;
         timeEventQueue = event->next;
@@ -515,7 +515,7 @@ findEvent(int revents, FdEventHandlerPtr events)
     FdEventHandlerPtr event;
 
     assert(!(revents & POLLNVAL));
-    
+
     if((revents & POLLHUP) || (revents & POLLERR)) {
         event = findEventHelper(POLLOUT, events);
         if(event) return event;
@@ -581,7 +581,7 @@ pokeFdEventHandler(TimeEventHandlerPtr tevent)
     return 1;
 }
 
-void 
+void
 pokeFdEvent(int fd, int status, int what)
 {
     TimeEventHandlerPtr handler;
@@ -618,7 +618,7 @@ workToDo()
     }
     return(rc >= 1);
 }
-    
+
 void
 eventLoop()
 {
@@ -648,7 +648,7 @@ eventLoop()
 
         timeToSleep(&sleep_time);
         if(sleep_time.tv_sec == -1) {
-            rc = poll(poll_fds, fdEventNum, 
+            rc = poll(poll_fds, fdEventNum,
                       diskIsClean ? -1 : idleTime * 1000);
         } else if(timeval_cmp(&sleep_time, &current_time) <= 0) {
             runTimeEventQueue();
@@ -674,7 +674,7 @@ eventLoop()
                 continue;
             } else if(errno == ENOMEM) {
                 free_chunk_arenas();
-                do_log(L_ERROR, 
+                do_log(L_ERROR,
                        "Couldn't poll: out of memory.  "
                        "Sleeping for one second.\n");
                 sleep(1);
@@ -698,7 +698,7 @@ eventLoop()
            assume that something changed whenever we see any activity. */
         diskIsClean = 0;
 
-        fd0 = 
+        fd0 =
             (current_time.tv_usec ^ (current_time.tv_usec >> 16)) % fdEventNum;
         n = rc;
         for(i = 0; i < fdEventNum; i++) {
@@ -720,7 +720,7 @@ eventLoop()
                 if(fds_invalid) {
                     fds_invalid = 0;
                     goto again;
-                } 
+                }
             }
         }
     }
@@ -789,7 +789,7 @@ unregisterConditionHandler(ConditionHandlerPtr handler)
     free(handler);
 }
 
-void 
+void
 abortConditionHandler(ConditionHandlerPtr handler)
 {
     int done;

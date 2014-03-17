@@ -23,7 +23,7 @@ THE SOFTWARE.
 #include "polipo.h"
 
 #define MB (1024 * 1024)
-int chunkLowMark = 0, 
+int chunkLowMark = 0,
     chunkCriticalMark = 0,
     chunkHighMark = 0;
 
@@ -112,7 +112,7 @@ maybe_free_chunks(int arenas, int force)
             objectExpiryScheduled = 1;
     }
 }
-    
+
 
 
 #ifdef MALLOC_CHUNKS
@@ -315,7 +315,7 @@ initChunks(void)
                 ARENA_CHUNKS * CHUNK_SIZE, ARENA_CHUNKS, CHUNK_SIZE, pagesize);
         abort();
     }
-    numArenas = 
+    numArenas =
         (CHUNKS(chunkHighMark) + (ARENA_CHUNKS - 1)) / ARENA_CHUNKS;
     chunkArenas = malloc(numArenas * sizeof(ChunkArenaRec));
     if(chunkArenas == NULL) {
@@ -372,7 +372,7 @@ get_chunk()
 
         if(used_chunks >= CHUNKS(chunkHighMark))
             return NULL;
-        
+
         arena = findArena();
         if(!arena)
             return NULL;

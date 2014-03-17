@@ -25,7 +25,7 @@ THE SOFTWARE.
 #ifndef NO_STANDARD_RESOLVER
 #ifndef NO_FANCY_RESOLVER
 int dnsUseGethostbyname = 1;
-#else 
+#else
 const int dnsUseGethostbyname = 3;
 #endif
 #else
@@ -87,7 +87,7 @@ static int really_do_dns(AtomPtr name, ObjectPtr object);
 
 #ifndef NO_FANCY_RESOLVER
 static int stringToLabels(char *buf, int offset, int n, char *string);
-static int labelsToString(char *buf, int offset, int n, char *d, 
+static int labelsToString(char *buf, int offset, int n, char *d,
                           int m, int *j_return);
 static int dnsBuildQuery(int id, char *buf, int offset, int n,
                          AtomPtr name, int af);
@@ -138,7 +138,7 @@ parseResolvConf(char *filename)
             if(c == EOF)
                 break;
         }
-        
+
         while(*p == ' ' || *p == '\t')
             p++;
         if(strcasecmp_n("nameserver", p, 10) != 0)
@@ -347,7 +347,7 @@ do_gethostbyname(char *origname,
     if(dnsUseGethostbyname >= 3)
         assert(!(object->flags & OBJECT_INITIAL));
 
-#ifndef NO_FANCY_RESOLVER    
+#ifndef NO_FANCY_RESOLVER
     if(object->flags & OBJECT_INITIAL) {
         ConditionHandlerPtr chandler;
         assert(object->flags & OBJECT_INPROGRESS);
@@ -362,7 +362,7 @@ do_gethostbyname(char *origname,
 
     if(object->headers && object->headers->length > 0) {
         if(object->headers->string[0] == DNS_A)
-            assert(((object->headers->length - 1) % 
+            assert(((object->headers->length - 1) %
                     sizeof(HostAddressRec)) == 0);
         else
             assert(object->headers->string[0] == DNS_CNAME);
@@ -405,7 +405,7 @@ dnsDelayedErrorNotifyHandler(TimeEventHandlerPtr event)
     releaseAtom(request.error_message); request.error_message = NULL;
     return 1;
 }
-    
+
 static int
 dnsDelayedDoneNotifyHandler(TimeEventHandlerPtr event)
 {
@@ -447,7 +447,7 @@ rfc2732(AtomPtr name)
     int rc;
     AtomPtr a = NULL;
 
-    if(name->length < 40+2 && 
+    if(name->length < 40+2 &&
        name->string[0] == '[' && name->string[name->length - 1] == ']') {
         struct in6_addr in6a;
         memcpy(buf, name->string + 1, name->length - 2);
@@ -572,28 +572,28 @@ really_do_gethostbyname(AtomPtr name, ObjectPtr object)
                 host.af = 4;
                 memset(host.data, 0, sizeof(host.data));
                 memcpy(&host.data,
-                       &((struct sockaddr_in*)entry->ai_addr)->sin_addr, 
+                       &((struct sockaddr_in*)entry->ai_addr)->sin_addr,
                        4);
                 host_valid = 1;
             }
-        } else if(entry->ai_family == AF_INET6 && 
+        } else if(entry->ai_family == AF_INET6 &&
                   entry->ai_protocol == IPPROTO_TCP) {
             if(dnsQueryIPv6 > 0) {
                 host.af = 6;
                 memset(&host.data, 0, sizeof(host.data));
                 memcpy(&host.data,
-                       &((struct sockaddr_in6*)entry->ai_addr)->sin6_addr, 
+                       &((struct sockaddr_in6*)entry->ai_addr)->sin6_addr,
                        16);
                 host_valid = 1;
             }
         }
         if(host_valid) {
             if(i >= 1024 / sizeof(HostAddressRec) - 2) {
-                do_log(L_ERROR, "Too many addresses for host %s\n", 
+                do_log(L_ERROR, "Too many addresses for host %s\n",
                        name->string);
                 break;
             }
-            memcpy(buf + 1 + i * sizeof(HostAddressRec), 
+            memcpy(buf + 1 + i * sizeof(HostAddressRec),
                    &host, sizeof(HostAddressRec));
             i++;
         }
@@ -627,7 +627,7 @@ really_do_gethostbyname(AtomPtr name, ObjectPtr object)
     return 0;
 }
 #endif
-    
+
 #else
 
 #ifndef NO_STANDARD_RESOLVER
@@ -661,7 +661,7 @@ really_do_gethostbyname(AtomPtr name, ObjectPtr object)
             return 0;
         } else {
             do_log_error(L_ERROR, error, "Gethostbyname failed");
-            abortObject(object, 404, 
+            abortObject(object, 404,
                         internAtomError(error, "Gethostbyname failed"));
             object->flags &= ~OBJECT_INPROGRESS;
             notifyObject(object);
@@ -785,7 +785,7 @@ removeQuery(DnsQueryPtr query)
 }
 
 static void
-insertQuery(DnsQueryPtr query) 
+insertQuery(DnsQueryPtr query)
 {
     if(inFlightDnsQueriesLast)
         inFlightDnsQueriesLast->next = query;
@@ -866,7 +866,7 @@ establishDnsSocket()
 #ifdef HAVE_IPv6
     int inet6 = (nameserverAddress.sa_family == AF_INET6);
     int pf = inet6 ? PF_INET6 : PF_INET;
-    int sa_size = 
+    int sa_size =
         inet6 ? sizeof(struct sockaddr_in6) : sizeof(struct sockaddr_in);
 #else
     int pf = PF_INET;
@@ -891,7 +891,7 @@ establishDnsSocket()
     }
 
     if(!dnsSocketHandler) {
-        dnsSocketHandler = 
+        dnsSocketHandler =
             registerFdEvent(dnsSocket, POLLIN, dnsReplyHandler, 0, NULL);
         if(dnsSocketHandler == NULL) {
             do_log(L_ERROR, "Couldn't register DNS socket handler.\n");
@@ -1042,7 +1042,7 @@ really_do_dns(AtomPtr name, ObjectPtr object)
     query->timeout_handler = NULL;
     query->next = NULL;
 
-    query->timeout_handler = 
+    query->timeout_handler =
         scheduleTimeEvent(query->timeout, dnsTimeoutHandler,
                           sizeof(query), &query);
     if(query->timeout_handler == NULL) {
@@ -1140,7 +1140,7 @@ dnsReplyHandler(int abort, FdEventHandlerPtr event)
         if(rc < 0) {
             do_log_error(L_WARN, -rc, "DNS");
             if(dnsUseGethostbyname >= 2 ||
-               (dnsUseGethostbyname && 
+               (dnsUseGethostbyname &&
                 (rc != -EDNS_HOST_NOT_FOUND && rc != -EDNS_NO_RECOVERY &&
                  rc != -EDNS_FORMAT))) {
                 dnsGethostbynameFallback(id, message);
@@ -1251,11 +1251,11 @@ dnsReplyHandler(int abort, FdEventHandlerPtr event)
                            query->inet4->string + 1, query->inet4->length - 1);
                 }
                 object->headers =
-                    internAtomN(buf, 
-                                query->inet4->length + 
+                    internAtomN(buf,
+                                query->inet4->length +
                                 query->inet6->length - 1);
                 if(object->headers == NULL)
-                    abortObject(object, 500, 
+                    abortObject(object, 500,
                                 internAtom("Couldn't allocate DNS atom"));
             }
             object->expires = MIN(query->ttl4, query->ttl6);
@@ -1266,7 +1266,7 @@ dnsReplyHandler(int abort, FdEventHandlerPtr event)
         do_log(L_WARN, "DNS object ex nihilo for %s.\n",
                scrub(query->name->string));
     }
-    
+
     removeQuery(query);
     free(query);
 
@@ -1457,7 +1457,7 @@ dnsBuildQuery(int id, char *buf, int offset, int n, AtomPtr name, int af)
 
     i = stringToLabels(buf, i, n, name->string);
     if(i < 0) return -ENAMETOOLONG;
-    
+
     if(i + 4 >= n) return -ENAMETOOLONG;
     DO_HTONS(&buf[i], type); i += 2;
     DO_HTONS(&buf[i], 1); i += 2;
@@ -1503,7 +1503,7 @@ dnsDecodeReply(char *buf, int offset, int n, int *id_return,
     DO_NTOHS(nscount, &buf[i]); i += 2;
     DO_NTOHS(arcount, &buf[i]); i += 2;
 
-    do_log(D_DNS, 
+    do_log(D_DNS,
            "DNS id %d, b23 0x%x, qdcount %d, ancount %d, "
            "nscount %d, arcount %d\n",
            id, b23, qdcount, ancount, nscount, arcount);
@@ -1522,7 +1522,7 @@ dnsDecodeReply(char *buf, int offset, int n, int *id_return,
 
     if(dnserror || qdcount != 1) {
         if(!dnserror)
-            do_log(L_ERROR, 
+            do_log(L_ERROR,
                    "Unexpected number %d of DNS questions.\n", qdcount);
         if(dnserror == 1)
             error = EDNS_FORMAT;
@@ -1591,7 +1591,7 @@ do { \
         PARSE_ANSWER("an", fail);
         if(strcasecmp_n(name->string, b, m) == 0) {
             if(class != 1) {
-                do_log(D_DNS, "DNS: %s: unknown class %d.\n", 
+                do_log(D_DNS, "DNS: %s: unknown class %d.\n",
                        name->string, class);
                 error = EDNS_UNSUPPORTED;
                 goto cont;
@@ -1599,7 +1599,7 @@ do { \
             if(type == 1 || type == 28) {
                 if((type == 1 && rdlength != 4) ||
                    (type == 28 && rdlength != 16)) {
-                    do_log(L_ERROR, 
+                    do_log(L_ERROR,
                            "DNS: %s: unexpected length %d of %s record.\n",
                            scrub(name->string),
                            rdlength, type == 1 ? "A" : "AAAA");

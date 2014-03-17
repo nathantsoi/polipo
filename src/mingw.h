@@ -21,10 +21,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-/* 
+/*
  * Polipo was originally designed to run on Unix-like systems. This
  * header file (and it's accompanying implementation file mingw.c) contain
- * code that allows polipo to run on Microsoft Windows too. 
+ * code that allows polipo to run on Microsoft Windows too.
  *
  * The target MS windows compiler is Mingw (MINimal Gnu for Windows). The
  * code in this file probably get's us pretty close to MSVC also, but

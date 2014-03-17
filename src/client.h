@@ -25,7 +25,7 @@ void httpClientFinish(HTTPConnectionPtr connection, int s);
 int httpClientHandler(int, FdEventHandlerPtr, StreamRequestPtr);
 int httpClientNoticeError(HTTPRequestPtr, int code, struct _Atom *message);
 int httpClientError(HTTPRequestPtr, int code, struct _Atom *message);
-int httpClientNewError(HTTPConnectionPtr, int method, int persist, 
+int httpClientNewError(HTTPConnectionPtr, int method, int persist,
                        int code, struct _Atom *message);
 int httpClientRawError(HTTPConnectionPtr, int, struct _Atom*, int close);
 int httpErrorStreamHandler(int status,
@@ -45,16 +45,16 @@ int httpClientRequestContinue(int forbidden_code, AtomPtr url,
 int httpClientDiscardBody(HTTPConnectionPtr connection);
 int httpClientDiscardHandler(int, FdEventHandlerPtr, StreamRequestPtr);
 int httpClientGetHandler(int, ConditionHandlerPtr);
-int httpClientHandlerHeaders(FdEventHandlerPtr event, 
+int httpClientHandlerHeaders(FdEventHandlerPtr event,
                                 StreamRequestPtr request,
                                 HTTPConnectionPtr connection);
 int httpClientNoticeRequest(HTTPRequestPtr request, int);
 int httpServeObject(HTTPConnectionPtr);
 int delayedHttpServeObject(HTTPConnectionPtr connection);
-int httpServeObjectStreamHandler(int status, 
+int httpServeObjectStreamHandler(int status,
                                  FdEventHandlerPtr event,
                                  StreamRequestPtr request);
-int httpServeObjectStreamHandler2(int status, 
+int httpServeObjectStreamHandler2(int status,
                                   FdEventHandlerPtr event,
                                   StreamRequestPtr request);
 int httpServeObjectHandler(int, ConditionHandlerPtr);

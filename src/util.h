@@ -90,7 +90,7 @@ char* vsprintf_a(const char *f, va_list args)
     ATTRIBUTE ((malloc, format (printf, 1, 0)));
 char* sprintf_a(const char *f, ...)
     ATTRIBUTE ((malloc, format (printf, 1, 2)));
-unsigned int hash(unsigned seed, const void *restrict key, int key_size, 
+unsigned int hash(unsigned seed, const void *restrict key, int key_size,
                   unsigned int hash_size)
      ATTRIBUTE ((pure));
 char *pstrerror(int e);

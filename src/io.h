@@ -89,19 +89,19 @@ do_stream(int operation, int fd, int offset, char *buf, int len,
           void *data);
 
 FdEventHandlerPtr
-do_stream_h(int operation, int fd, int offset, 
+do_stream_h(int operation, int fd, int offset,
             char *header, int hlen, char *buf, int len,
             int (*handler)(int, FdEventHandlerPtr, StreamRequestPtr),
             void *data);
 
 FdEventHandlerPtr
-do_stream_2(int operation, int fd, int offset, 
+do_stream_2(int operation, int fd, int offset,
             char *buf, int len, char *buf2, int len2,
             int (*handler)(int, FdEventHandlerPtr, StreamRequestPtr),
             void *data);
 
 FdEventHandlerPtr
-do_stream_3(int operation, int fd, int offset, 
+do_stream_3(int operation, int fd, int offset,
             char *buf, int len, char *buf2, int len2, char *buf3, int len3,
             int (*handler)(int, FdEventHandlerPtr, StreamRequestPtr),
             void *data);
@@ -134,7 +134,7 @@ do_accept(int fd,
           int (*handler)(int, FdEventHandlerPtr, AcceptRequestPtr),
           void* data);
 
-FdEventHandlerPtr 
+FdEventHandlerPtr
 schedule_accept(int fd,
                 int (*handler)(int, FdEventHandlerPtr, AcceptRequestPtr),
                 void* data);
@@ -158,4 +158,3 @@ typedef struct _NetAddress {
 
 NetAddressPtr parseNetAddress(AtomListPtr list);
 int netAddressMatch(int fd, NetAddressPtr list) ATTRIBUTE ((pure));
-

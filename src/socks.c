@@ -446,7 +446,7 @@ socks5WriteHandler(int status,
                    StreamRequestPtr srequest)
 {
     SocksRequestPtr request = srequest->data;
-    
+
     if(status < 0)
         goto error;
 

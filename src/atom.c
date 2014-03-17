@@ -239,7 +239,7 @@ internAtomF(const char *format, ...)
 static AtomPtr
 internAtomErrorV(int e, const char *f, va_list args)
 {
-    
+
     char *es = pstrerror(e);
     AtomPtr atom;
     char *s1, *s2;
@@ -376,4 +376,3 @@ atomListCons(AtomPtr atom, AtomListPtr list)
     list->list[list->length] = atom;
     list->length++;
 }
-

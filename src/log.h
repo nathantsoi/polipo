@@ -110,7 +110,7 @@ const char *scrub(const char *message);
 
 /* No variadic macros -- let's hope inline works. */
 
-static inline void 
+static inline void
 do_log(int type, const char *f, ...)
 {
     va_list args;
@@ -130,7 +130,7 @@ do_log_error(int type, int e, const char *f, ...)
     if((type & (LOGGING_MAX)) != 0)
         really_do_log_error_v(type, e, f, args);
     va_end(args);
-}    
+}
 
 #endif
 

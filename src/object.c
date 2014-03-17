@@ -180,7 +180,7 @@ makeObject(int type, const void *key, int key_size, int public, int fromdisk,
         }
     }
 
-    if(publicObjectCount >= publicObjectLowMark && 
+    if(publicObjectCount >= publicObjectLowMark &&
        !objectExpiryScheduled) {
         TimeEventHandlerPtr event;
         event = scheduleTimeEvent(-1, discardObjectsHandler, 0, NULL);
@@ -209,7 +209,7 @@ makeObject(int type, const void *key, int key_size, int public, int fromdisk,
     object->key_size = key_size;
     object->flags = (public?OBJECT_PUBLIC:0) | OBJECT_INITIAL;
     if(public) {
-        h = hash(object->type, object->key, object->key_size, 
+        h = hash(object->type, object->key, object->key_size,
                  log2ObjectHashTableSize);
         if(objectHashTable[h]) {
             writeoutToDisk(objectHashTable[h], objectHashTable[h]->size, -1);
@@ -260,7 +260,7 @@ makeObject(int type, const void *key, int key_size, int public, int fromdisk,
     return object;
 }
 
-void 
+void
 objectMetadataChanged(ObjectPtr object, int revalidate)
 {
     if(revalidate) {
@@ -288,7 +288,7 @@ releaseObject(ObjectPtr object)
            (unsigned long)object, object->refcount);
     object->refcount--;
     if(object->refcount == 0) {
-        assert(!object->condition.handlers && 
+        assert(!object->condition.handlers &&
                !(object->flags & OBJECT_INPROGRESS));
         if(!(object->flags & OBJECT_PUBLIC))
             destroyObject(object);
@@ -304,14 +304,14 @@ releaseNotifyObject(ObjectPtr object)
     if(object->refcount > 0) {
         notifyObject(object);
     } else {
-        assert(!object->condition.handlers && 
+        assert(!object->condition.handlers &&
                !(object->flags & OBJECT_INPROGRESS));
         if(!(object->flags & OBJECT_PUBLIC))
             destroyObject(object);
     }
 }
 
-void 
+void
 lockChunk(ObjectPtr object, int i)
 {
     do_log(D_LOCK, "Lock 0x%lx[%d]: ", (unsigned long)object, i);
@@ -322,7 +322,7 @@ lockChunk(ObjectPtr object, int i)
     do_log(D_LOCK, "%d\n", object->chunks[i].locked);
 }
 
-void 
+void
 unlockChunk(ObjectPtr object, int i)
 {
     do_log(D_LOCK, "Unlock 0x%lx[%d]: ", (unsigned long)object, i);
@@ -343,9 +343,9 @@ objectSetChunks(ObjectPtr object, int numchunks)
     if(object->length >= 0)
         n = MAX(numchunks, (object->length + (CHUNK_SIZE - 1)) / CHUNK_SIZE);
     else
-        n = MAX(numchunks, 
+        n = MAX(numchunks,
                 MAX(object->numchunks + 2, object->numchunks * 5 / 4));
-    
+
     if(n == 0) {
         assert(object->chunks == NULL);
     } else if(object->numchunks == 0) {
@@ -436,7 +436,7 @@ objectAddChunkEnd(ObjectPtr object, const char *data, int offset, int plen)
     int i = offset / CHUNK_SIZE;
     int rc;
 
-    assert(offset % CHUNK_SIZE != 0 && 
+    assert(offset % CHUNK_SIZE != 0 &&
            offset % CHUNK_SIZE + plen <= CHUNK_SIZE);
 
     if(object->numchunks <= i) {
@@ -487,13 +487,13 @@ objectAddData(ObjectPtr object, const char *data, int offset, int len)
 
     if(object->length >= 0) {
         if(offset + len > object->length) {
-            do_log(L_ERROR, 
+            do_log(L_ERROR,
                    "Inconsistent object length (%d, should be at least %d).\n",
                    object->length, offset + len);
             object->length = offset + len;
         }
     }
-            
+
     object->flags &= ~OBJECT_FAILED;
 
     if(offset + len >= object->numchunks * CHUNK_SIZE) {
@@ -510,7 +510,7 @@ objectAddData(ObjectPtr object, const char *data, int offset, int len)
         rc = objectAddChunkEnd(object, data, offset, plen);
         if(rc < 0) {
             return -1;
-        }            
+        }
         offset += plen;
         data += plen;
         len -= plen;
@@ -552,7 +552,7 @@ objectPrintf(ObjectPtr object, int offset, const char *format, ...)
         abortObject(object, 500, internAtom("Couldn't add data to object"));
 }
 
-int 
+int
 objectHoleSize(ObjectPtr object, int offset)
 {
     int size = 0, i;
@@ -642,7 +642,7 @@ destroyObject(ObjectPtr object)
     int i;
 
     assert(object->refcount == 0 && !object->requestor);
-    assert(!object->condition.handlers && 
+    assert(!object->condition.handlers &&
            (object->flags & OBJECT_INPROGRESS) == 0);
 
     if(object->disk_entry)
@@ -671,7 +671,7 @@ destroyObject(ObjectPtr object)
 }
 
 void
-privatiseObject(ObjectPtr object, int linear) 
+privatiseObject(ObjectPtr object, int linear)
 {
     int i, h;
     if(!(object->flags & OBJECT_PUBLIC)) {
@@ -694,7 +694,7 @@ privatiseObject(ObjectPtr object, int linear)
         }
     }
 
-    h = hash(object->type, object->key, object->key_size, 
+    h = hash(object->type, object->key, object->key_size,
              log2ObjectHashTableSize);
     assert(objectHashTable[h] == object);
     objectHashTable[h] = NULL;
@@ -739,7 +739,7 @@ abortObject(ObjectPtr object, int code, AtomPtr message)
     object->last_modified = -1;
     if(object->etag) free(object->etag);
     object->etag = NULL;
-    if(object->headers) releaseAtom(object->headers); 
+    if(object->headers) releaseAtom(object->headers);
     object->headers = NULL;
     object->size = 0;
     for(i = 0; i < object->numchunks; i++) {
@@ -754,7 +754,7 @@ abortObject(ObjectPtr object, int code, AtomPtr message)
     privatiseObject(object, 0);
 }
 
-void 
+void
 supersedeObject(ObjectPtr object)
 {
     object->flags |= OBJECT_SUPERSEDED;
@@ -764,7 +764,7 @@ supersedeObject(ObjectPtr object)
 }
 
 void
-notifyObject(ObjectPtr object) 
+notifyObject(ObjectPtr object)
 {
     retainObject(object);
     signalCondition(&object->condition);
@@ -792,7 +792,7 @@ writeoutObjects(int all)
     while(object) {
         do {
             if(!all) {
-                if(objects >= maxObjectsWhenIdle || 
+                if(objects >= maxObjectsWhenIdle ||
                    bytes >= maxWriteoutWhenIdle) {
                     if(workToDo()) return;
                     objects = 0;
@@ -820,12 +820,12 @@ discardObjects(int all, int force)
         return 0;
 
     in_discardObjects = 1;
-    
+
     if(all || force || used_chunks >= CHUNKS(chunkHighMark) ||
        publicObjectCount >= publicObjectLowMark ||
        publicObjectCount + privateObjectCount >= objectHighMark) {
         object = object_list_end;
-        while(object && 
+        while(object &&
               (all || force || used_chunks >= CHUNKS(chunkLowMark))) {
             if(force || ((object->flags & OBJECT_PUBLIC) &&
                          object->numchunks > CHUNKS(chunkLowMark) / 4)) {
@@ -845,10 +845,10 @@ discardObjects(int all, int force)
             }
             object = object->previous;
         }
-        
+
         i = 0;
         object = object_list_end;
-        while(object && 
+        while(object &&
               (all || force ||
                used_chunks - i > CHUNKS(chunkLowMark) ||
                used_chunks > CHUNKS(chunkCriticalMark) ||
@@ -868,12 +868,12 @@ discardObjects(int all, int force)
         object = object_list_end;
         if(force || used_chunks > CHUNKS(chunkCriticalMark)) {
             if(used_chunks > CHUNKS(chunkCriticalMark)) {
-                do_log(L_WARN, 
+                do_log(L_WARN,
                        "Short on chunk memory -- "
                        "attempting to punch holes "
                        "in the middle of objects.\n");
             }
-            while(object && 
+            while(object &&
                   (force || used_chunks > CHUNKS(chunkCriticalMark))) {
                 if(force || (object->flags & OBJECT_PUBLIC)) {
                     int j;
@@ -961,7 +961,7 @@ objectIsStale(ObjectPtr object, CacheControlPtr cache_control)
             s_maxage = cache_control->s_maxage;
     } else
         s_maxage = object->s_maxage;
-    
+
     if(max_age >= 0)
         stale = MIN(stale, object->age + max_age);
 
@@ -1019,7 +1019,7 @@ objectMustRevalidate(ObjectPtr object, CacheControlPtr cache_control)
         flags = object->cache_control | cache_control->flags;
     else
         flags = cache_control->flags;
-    
+
     if(flags & (CACHE_NO | CACHE_NO_HIDDEN | CACHE_NO_STORE))
         return 1;
 
@@ -1037,4 +1037,3 @@ objectMustRevalidate(ObjectPtr object, CacheControlPtr cache_control)
 
     return 0;
 }
-

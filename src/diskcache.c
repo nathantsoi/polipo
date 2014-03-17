@@ -481,7 +481,7 @@ createFile(const char *name, int path_start)
     }
 
     fd = open(name, O_RDWR | O_CREAT | O_EXCL | O_BINARY,
-	      diskCacheFilePermissions);
+        diskCacheFilePermissions);
     if(fd >= 0)
         return fd;
     if(errno != ENOENT) {
@@ -505,7 +505,7 @@ createFile(const char *name, int path_start)
         n++;
     }
     fd = open(name, O_RDWR | O_CREAT | O_EXCL | O_BINARY,
-	      diskCacheFilePermissions);
+        diskCacheFilePermissions);
     if(fd < 0) {
         do_log_error(L_ERROR, errno, "Couldn't create file %s", name);
         return -1;
@@ -2304,7 +2304,7 @@ copyFile(int from, char *filename, int n)
         return -1;
 
     to = open(filename, O_RDWR | O_CREAT | O_EXCL | O_BINARY,
-	      diskCacheFilePermissions);
+        diskCacheFilePermissions);
     if(to < 0) {
         free(buf);
         return -1;

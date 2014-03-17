@@ -344,7 +344,7 @@ initForbidden(void)
 
     if(forbiddenTunnelsFile)
         forbiddenTunnelsFile = expandTilde(forbiddenTunnelsFile);
-    
+
     if(forbiddenTunnelsFile == NULL) {
         forbiddenTunnelsFile = expandTilde(internAtom("~/.polipo-forbiddenTunnels"));
         if(forbiddenTunnelsFile) {
@@ -354,15 +354,15 @@ initForbidden(void)
             }
         }
     }
-    
+
     if(forbiddenTunnelsFile == NULL) {
         if(access("/etc/polipo/forbiddenTunnels", F_OK) >= 0)
             forbiddenTunnelsFile = internAtom("/etc/polipo/forbiddenTunnels");
     }
-    
+
     parseDomainFile(forbiddenTunnelsFile, &forbiddenTunnelsDomains, &forbiddenTunnelsRegex);
     //
-    
+
     return;
 }
 
@@ -370,21 +370,21 @@ int
 tunnelIsMatched(char *url, int lurl, char *hostname, int lhost)
 {
     DomainPtr *domain, *domains;
-    
+
     domains=forbiddenTunnelsDomains;
     if (domains) {
-	domain = domains;
-	while(*domain) {
-	    if (lhost == (*domain)->length && 
-		memcmp(hostname, (*domain)->domain, lhost)==0)
-		return 1;
-	    domain++;
-	}
+  domain = domains;
+  while(*domain) {
+      if (lhost == (*domain)->length &&
+    memcmp(hostname, (*domain)->domain, lhost)==0)
+    return 1;
+      domain++;
+  }
     }
 
     if(forbiddenTunnelsRegex) {
-	if(!regexec(forbiddenTunnelsRegex, url, 0, NULL, 0))
-	    return 1;
+  if(!regexec(forbiddenTunnelsRegex, url, 0, NULL, 0))
+      return 1;
     }
     return 0;
 }

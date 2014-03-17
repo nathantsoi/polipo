@@ -29,7 +29,7 @@ int daemonise = 0;
 static void
 usage(char *argv0)
 {
-    fprintf(stderr, 
+    fprintf(stderr,
             "%s [ -h ] [ -v ] [ -x ] [ -c filename ] [ -- ] [ var=val... ]\n",
             argv0);
     fprintf(stderr, "  -h: display this message.\n");
@@ -155,7 +155,7 @@ main(int argc, char **argv)
     if(pidFile)
         writePid(pidFile->string);
 
-    listener = create_listener(proxyAddress->string, 
+    listener = create_listener(proxyAddress->string,
                                proxyPort, httpAccept, NULL);
     if(!listener) {
         if(pidFile) unlink(pidFile->string);

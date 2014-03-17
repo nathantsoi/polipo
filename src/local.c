@@ -55,7 +55,7 @@ preinitLocal()
 
 static void fillSpecialObject(ObjectPtr, void (*)(FILE*, char*), void*);
 
-int 
+int
 httpLocalRequest(ObjectPtr object, int method, int from, int to,
                  HTTPRequestPtr requestor, void *closure)
 {
@@ -63,7 +63,7 @@ httpLocalRequest(ObjectPtr object, int method, int from, int to,
         object->requestor = requestor;
 
     if(!disableLocalInterface && urlIsSpecial(object->key, object->key_size))
-        return httpSpecialRequest(object, method, from, to, 
+        return httpSpecialRequest(object, method, from, to,
                                   requestor, closure);
 
     if(method >= METHOD_POST) {
@@ -142,8 +142,8 @@ matchUrl(char *base, ObjectPtr object)
         return 0;
     return (object->key_size == n) || (((char*)object->key)[n] == '?');
 }
-    
-int 
+
+int
 httpSpecialRequest(ObjectPtr object, int method, int from, int to,
                    HTTPRequestPtr requestor, void *closure)
 {
@@ -226,7 +226,7 @@ httpSpecialRequest(ObjectPtr object, int method, int from, int to,
                      cacheIsShared ? "shared" : "private",
                      proxyName->string, proxyPort,
                      proxyOffline ? "off line" :
-                     (relaxTransparency ? 
+                     (relaxTransparency ?
                       "on line (transparency relaxed)" :
                       "on line"),
                      publicObjectCount, privateObjectCount,
@@ -295,7 +295,7 @@ httpSpecialRequest(ObjectPtr object, int method, int from, int to,
     return 1;
 }
 
-int 
+int
 httpSpecialSideRequest(ObjectPtr object, int method, int from, int to,
                        HTTPRequestPtr requestor, void *closure)
 {
@@ -360,13 +360,13 @@ httpSpecialClientSideHandler(int status,
     HTTPRequestPtr request = connection->request;
     int push;
 
-    if((request->object->flags & OBJECT_ABORTED) || 
+    if((request->object->flags & OBJECT_ABORTED) ||
        !(request->object->flags & OBJECT_INPROGRESS)) {
         httpClientDiscardBody(connection);
         httpClientError(request, 503, internAtom("Post aborted"));
         return 1;
     }
-        
+
     if(status < 0) {
         do_log_error(L_ERROR, -status, "Reading from client");
         if(status == -EDOGRACEFUL)
@@ -445,11 +445,11 @@ httpSpecialDoSideFinish(AtomPtr data, HTTPRequestPtr requestor)
             goto out;
         }
         for(i = 0; i < list->length; i++) {
-            char *equals = 
+            char *equals =
                 memchr(list->list[i]->string, '=', list->list[i]->length);
-            AtomPtr name = 
-                equals ? 
-                internAtomN(list->list[i]->string, 
+            AtomPtr name =
+                equals ?
+                internAtomN(list->list[i]->string,
                             equals - list->list[i]->string) :
                 retainAtom(list->list[i]);
             if(name == atomInitForbidden)
@@ -529,7 +529,7 @@ fillSpecialObject(ObjectPtr object, void (*fn)(FILE*, char*), void* closure)
         close(filedes[1]);
         return;
     }
-    
+
     pid = fork();
     if(pid < 0) {
         do_log_error(L_ERROR, errno, "Couldn't fork");
@@ -607,7 +607,7 @@ fillSpecialObject(ObjectPtr object, void (*fn)(FILE*, char*), void* closure)
 }
 
 int
-specialRequestHandler(int status, 
+specialRequestHandler(int status,
                       FdEventHandlerPtr event, StreamRequestPtr srequest)
 {
     SpecialRequestPtr request = srequest->data;
@@ -624,7 +624,7 @@ specialRequestHandler(int status,
     }
 
     if(srequest->offset > 0) {
-        rc = objectAddData(request->object, request->buf, 
+        rc = objectAddData(request->object, request->buf,
                            request->offset, srequest->offset);
         if(rc < 0) {
             kill(request->pid, SIGTERM);
@@ -668,18 +668,18 @@ specialRequestHandler(int status,
     if(rc < 0) {
         do_log(L_ERROR, "Wait for %d: %d\n", (int)request->pid, errno);
     } else {
-        int normal = 
+        int normal =
             (WIFEXITED(status) && WEXITSTATUS(status) == 0) ||
             (killed && WIFSIGNALED(status) && WTERMSIG(status) == SIGTERM);
         char *reason =
-            WIFEXITED(status) ? "with status" : 
+            WIFEXITED(status) ? "with status" :
             WIFSIGNALED(status) ? "on signal" :
             "with unknown status";
         int value =
             WIFEXITED(status) ? WEXITSTATUS(status) :
             WIFSIGNALED(status) ? WTERMSIG(status) :
             status;
-        do_log(normal ? D_CHILD : L_ERROR, 
+        do_log(normal ? D_CHILD : L_ERROR,
                "Child %d exited %s %d.\n",
                (int)request->pid, reason, value);
     }
